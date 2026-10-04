@@ -33,6 +33,7 @@ export const DsCommandSchema = z.discriminatedUnion('type', [
   c('START_PROBE', {}),
   c('END_PROBE', {}),
   c('VIEW_AS', { role: RoleIdSchema.nullable() }),
+  c('RELEASE_ROLE', { role: RoleIdSchema }),
 ]);
 export type DsCommand = z.infer<typeof DsCommandSchema>;
 

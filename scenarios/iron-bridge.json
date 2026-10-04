@@ -1,0 +1,162 @@
+{
+  "id": "iron-bridge",
+  "title": "Iron Bridge",
+  "theatre": "Joint · plains / riverine estuary",
+  "summary": "A dawn river crossing has failed. Three BLUE elements must converge on IRON BRIDGE and seize a bridgehead before hostile engineers drop it. UAV and ground sensors disagree about hostile armour, a jammer isolates one platoon, a C2 outage hits mid-fight, and air support only arrives if the ALO asks for it.",
+  "durationMin": 30,
+  "defaultSeed": 2611,
+  "brief": {
+    "situation": "BLUE Brigade's dawn crossing at the IRON BRIDGE site failed under observed fire. The bridge (E5) is still standing but prepared for demolition by hostile engineers on the south bank (E6). HHQ INTSUM: a hostile armour company is assessed in the D6–E7 area; decoy employment is likely. A hostile EW detachment has been active east of the crossing. A coastal patrol vessel (OPV ARGUS) is watching the estuary to the east.",
+    "mission": "KESTREL Company seizes IRON BRIDGE intact and establishes a bridgehead at E6 by T+20 in order to enable BLUE Brigade's crossing at T+25.",
+    "execution": "Three elements converge: KESTREL 1 (PL A) from the west, KESTREL 2 (PL B) from the east, Company HQ follows on the axis C2–D4. HAWK 1 (ALO) controls the UAV and can request close air support (available from T+15 if requested). SPECTRE (EW) manages the PACE plan and the rebro on HILL 214 (D3). TRIDENT (NLO) exploits the coastal radar and naval reporting.",
+    "sustainment": "Runners available at every HQ. Casualty evacuation via C2.",
+    "command": "PACE: CMD NET → alternate net → HF NET → RUNNER. If cut off from KESTREL 6, act on the commander's intent."
+  },
+  "terrain": [
+    "..FF....",
+    ".F....U.",
+    "...U....",
+    "..F...H.",
+    "~~~~=~~W",
+    "M.....WW",
+    "...F..WW",
+    "..U..WWW"
+  ],
+  "features": [
+    {
+      "id": "bridge-e5",
+      "kind": "BRIDGE",
+      "label": "IRON BRIDGE",
+      "cell": "E5",
+      "destroyAtS": 1200,
+      "unlessBlueIn": ["E5", "E6"]
+    }
+  ],
+  "intent": {
+    "text": "Seize IRON BRIDGE (E5) intact and establish a bridgehead at E6 by T+20 so the brigade can cross at T+25. Preserve combat power for the crossing. Do not get drawn west into the marsh (A6). If cut off, act to keep the bridge intact and the crossing site open.",
+    "objectiveCells": ["E5", "E6"],
+    "forbiddenCells": ["A6"],
+    "priority": "SEIZE",
+    "deadlineS": 1200
+  },
+  "objectives": [
+    { "id": "obj-bridge", "text": "Secure IRON BRIDGE intact", "cell": "E5" },
+    { "id": "obj-bridgehead", "text": "Establish bridgehead south bank", "cell": "E6" }
+  ],
+  "roles": [
+    {
+      "id": "CDR",
+      "title": "Sub-unit Commander",
+      "callsign": "KESTREL 6",
+      "superior": "HHQ",
+      "unitId": "b-hq",
+      "pace": ["CMD_NET", "SATCOM", "HF_NET", "RUNNER"],
+      "description": "Fuses reports from UAV, sensors, platoons and HHQ. Issues and refines intent, orders the platoons, makes the final call."
+    },
+    {
+      "id": "PL_A",
+      "title": "Platoon Commander A",
+      "callsign": "KESTREL 1",
+      "superior": "CDR",
+      "unitId": "b-pla",
+      "pace": ["CMD_NET", "PL_NET_A", "HF_NET", "RUNNER"],
+      "description": "Western mechanised platoon. Sees its own sector and the ground-sensor string. Reports contacts and relays."
+    },
+    {
+      "id": "PL_B",
+      "title": "Platoon Commander B",
+      "callsign": "KESTREL 2",
+      "superior": "CDR",
+      "unitId": "b-plb",
+      "pace": ["CMD_NET", "PL_NET_B", "HF_NET", "RUNNER"],
+      "description": "Eastern mechanised platoon. Expect to be isolated by hostile jamming — know the intent."
+    },
+    {
+      "id": "ALO",
+      "title": "Air Liaison / ISR Officer",
+      "callsign": "HAWK 1",
+      "superior": "CDR",
+      "unitId": "b-tacp",
+      "pace": ["CMD_NET", "SATCOM", "HF_NET", "RUNNER"],
+      "description": "Controls UAV KITE-3 on the ISR datalink and requests/clears close air support (available from T+15 only if requested)."
+    },
+    {
+      "id": "EW",
+      "title": "EW / Signals Officer",
+      "callsign": "SPECTRE",
+      "superior": "CDR",
+      "unitId": "b-ew",
+      "pace": ["CMD_NET", "PL_NET_B", "HF_NET", "RUNNER"],
+      "description": "Reads the spectrum (partial DF), manages PACE, relocates the rebro and orders frequency hops."
+    },
+    {
+      "id": "NLO",
+      "title": "Naval Liaison Officer",
+      "callsign": "TRIDENT",
+      "superior": "CDR",
+      "unitId": "b-nlo",
+      "pace": ["SATCOM", "CMD_NET", "HF_NET", "RUNNER"],
+      "optional": true,
+      "description": "Optional 6th role. Exploits the coastal radar and OPV ARGUS reporting over SATCOM; watches the estuary flank."
+    }
+  ],
+  "nodes": [
+    { "id": "HHQ", "label": "BLUE Brigade HQ", "pos": { "x": -2, "y": 2 } },
+    { "id": "NAVAL-ISR", "label": "OPV ARGUS", "pos": { "x": 9, "y": 6 } },
+    { "id": "REBRO-214", "label": "Rebro HILL 214", "cell": "D3", "relay": true }
+  ],
+  "units": [
+    { "id": "b-hq", "side": "BLUE", "callsign": "KESTREL 6", "type": "HQ", "count": 3, "strength": 60, "ownerRole": "CDR", "waypoints": [{ "atS": 0, "cell": "C2" }] },
+    { "id": "b-pla", "side": "BLUE", "callsign": "KESTREL 1", "type": "MECH", "count": 4, "strength": 100, "ownerRole": "PL_A", "waypoints": [{ "atS": 0, "cell": "B3" }] },
+    { "id": "b-plb", "side": "BLUE", "callsign": "KESTREL 2", "type": "MECH", "count": 4, "strength": 100, "ownerRole": "PL_B", "waypoints": [{ "atS": 0, "cell": "G3" }] },
+    { "id": "b-tacp", "side": "BLUE", "callsign": "HAWK 1", "type": "TACP", "count": 1, "strength": 20, "ownerRole": "ALO", "waypoints": [{ "atS": 0, "cell": "C2" }] },
+    { "id": "b-ew", "side": "BLUE", "callsign": "SPECTRE", "type": "EW_DET", "count": 1, "strength": 20, "ownerRole": "EW", "waypoints": [{ "atS": 0, "cell": "D2" }] },
+    { "id": "b-nlo", "side": "BLUE", "callsign": "TRIDENT", "type": "HQ", "count": 1, "strength": 10, "ownerRole": "NLO", "waypoints": [{ "atS": 0, "cell": "C2" }] },
+    {
+      "id": "r-armour-1", "side": "RED", "callsign": "HOSTILE ARMOUR COY", "type": "ARMOUR", "count": 6, "strength": 150,
+      "waypoints": [{ "atS": 0, "cell": "G8" }, { "atS": 300, "cell": "G7" }, { "atS": 720, "cell": "F6" }, { "atS": 1080, "cell": "E6" }]
+    },
+    { "id": "r-decoy-1", "side": "RED", "callsign": "DECOY PARK D6", "type": "ARMOUR", "count": 5, "strength": 0, "decoy": true, "waypoints": [{ "atS": 0, "cell": "D6" }] },
+    { "id": "r-inf-1", "side": "RED", "callsign": "BRIDGE GUARD", "type": "INFANTRY", "count": 3, "strength": 60, "waypoints": [{ "atS": 0, "cell": "E6" }] },
+    { "id": "r-eng-1", "side": "RED", "callsign": "DEMOLITION PARTY", "type": "ENGINEER", "count": 2, "strength": 20, "waypoints": [{ "atS": 0, "cell": "E6" }] },
+    { "id": "r-recce-1", "side": "RED", "callsign": "HOSTILE RECCE", "type": "RECCE", "count": 2, "strength": 30, "waypoints": [{ "atS": 0, "cell": "B7" }, { "atS": 400, "cell": "C6" }] },
+    { "id": "r-craft-1", "side": "RED", "callsign": "FAST CRAFT PAIR", "type": "SHIP", "count": 2, "strength": 40, "waypoints": [{ "atS": 0, "cell": "H7" }, { "atS": 300, "cell": "H6" }, { "atS": 600, "cell": "H5" }] }
+  ],
+  "sensors": [
+    { "id": "uav-kite3", "kind": "UAV", "label": "UAV KITE-3", "channel": "ISR_DATALINK", "cell": "D5", "rangeCells": 2.5, "intervalS": 45, "deliverTo": ["ALO", "CDR"], "ownerRole": "ALO" },
+    { "id": "ugs-delta", "kind": "GROUND_SENSOR", "label": "UGS STRING DELTA", "channel": "GROUND_SENSOR", "cell": "D6", "rangeCells": 0.6, "intervalS": 60, "deliverTo": ["CDR", "PL_A"], "discriminatesDecoys": true, "reportsNegatives": true },
+    { "id": "radar-argus", "kind": "COASTAL_RADAR", "label": "COASTAL RADAR (OPV ARGUS)", "channel": "SATCOM", "cell": "H4", "rangeCells": 3, "intervalS": 60, "deliverTo": ["NLO", "CDR"], "detects": ["SHIP"], "ownerRole": "NLO" }
+  ],
+  "air": { "availableFromS": 900, "responseS": 120, "sorties": 2 },
+  "scriptedReports": [
+    {
+      "atS": 60, "from": "HHQ", "fromLabel": "HHQ INTSUM", "channel": "SATCOM", "to": ["CDR"], "kind": "INFO", "confidence": "M",
+      "text": "INTSUM 1. Hostile armour company assessed D6–E7. Decoy employment likely. Bridge prepared for demolition; expect firing NET T+20."
+    }
+  ],
+  "msel": [
+    { "id": "IB-01", "atS": 120, "title": "UAV feed lag at company CP", "note": "Stale imagery: CP sees where the armour WAS.", "action": { "kind": "INJECT", "inject": { "type": "STALE", "channels": ["ISR_DATALINK"], "roles": ["CDR"], "durationS": 240, "params": { "staleS": 300 }, "label": "ISR imagery 5 min stale at CP" } } },
+    { "id": "IB-02", "atS": 240, "title": "Naval report: fast craft in estuary", "action": { "kind": "REPORT", "report": { "from": "NAVAL-ISR", "fromLabel": "OPV ARGUS", "channel": "SATCOM", "to": ["CDR", "NLO"], "kind": "CONTACT", "cell": "H6", "unitType": "SHIP", "count": 2, "confidence": "M", "text": "OPV ARGUS: 2x hostile fast craft GRID H6, heading north towards the river mouth." } } },
+    { "id": "IB-03", "atS": 300, "title": "Contradictory reports on D6", "note": "Voice report of armour vs. no-contact report.", "action": { "kind": "INJECT", "inject": { "type": "CONFLICT", "channels": ["CMD_NET"], "roles": ["CDR"], "durationS": 120, "params": { "targetCell": "D6" }, "label": "Conflicting D6 reports on CMD NET" } } },
+    { "id": "IB-04", "atS": 360, "title": "Hostile jammer over CDR–PL B link", "note": "PL B loses VHF and HF: cut off.", "action": { "kind": "JAMMER", "jammer": { "id": "J-RED-1", "label": "Hostile jammer (east)", "cell": "G2", "radius": 2, "bands": ["VHF", "HF"], "power": 1, "active": true } } },
+    { "id": "IB-05", "atS": 420, "title": "HF net delays (poor propagation)", "action": { "kind": "INJECT", "inject": { "type": "DELAY", "channels": ["HF_NET"], "roles": [], "durationS": 180, "params": { "delayS": 60 }, "label": "HF propagation delay" } } },
+    { "id": "IB-06", "atS": 480, "title": "Voice deception on command net", "action": { "kind": "INJECT", "inject": { "type": "SPOOF", "channels": ["CMD_NET"], "roles": ["PL_A"], "durationS": 120, "params": { "targetCell": "B5" }, "label": "Hostile imitative deception (CMD NET)" } } },
+    { "id": "IB-07", "atS": 540, "title": "PL net A silently failing", "note": "Link looks fine; traffic vanishes.", "action": { "kind": "INJECT", "inject": { "type": "MISSING", "channels": ["PL_NET_A"], "roles": [], "durationS": 180, "params": {}, "label": "PL NET A crypto fill mismatch" } } },
+    { "id": "IB-08", "atS": 600, "title": "UAV datalink compromised", "action": { "kind": "CYBER", "cyber": { "kind": "DATALINK_COMPROMISE", "durationS": 150 } } },
+    { "id": "IB-09", "atS": 660, "title": "SATCOM rain fade", "action": { "kind": "INJECT", "inject": { "type": "INTERMITTENT", "channels": ["SATCOM"], "roles": [], "durationS": 240, "params": { "periodS": 30 }, "label": "SATCOM intermittent" } } },
+    { "id": "IB-10", "atS": 720, "title": "C2 outage (digital)", "action": { "kind": "CYBER", "cyber": { "kind": "C2_OUTAGE", "durationS": 120 } } },
+    { "id": "IB-11", "atS": 780, "title": "GPS spoofing on PL A", "action": { "kind": "CYBER", "cyber": { "kind": "GPS_SPOOF", "role": "PL_A", "durationS": 300, "driftCells": 1.5 } } },
+    { "id": "IB-12", "atS": 840, "title": "Ground sensor string fails", "action": { "kind": "INJECT", "inject": { "type": "DROPOUT", "channels": ["GROUND_SENSOR"], "roles": [], "durationS": 300, "params": {}, "label": "UGS DELTA battery failure" } } },
+    { "id": "IB-13", "atS": 960, "title": "Hostile jammer goes off air (relocating)", "action": { "kind": "JAMMER_TOGGLE", "jammerId": "J-RED-1", "active": false } },
+    { "id": "IB-14", "atS": 1020, "title": "HHQ: H-hour confirmed", "action": { "kind": "REPORT", "report": { "from": "HHQ", "fromLabel": "HHQ", "channel": "SATCOM", "to": ["CDR"], "kind": "INFO", "confidence": "H", "text": "HHQ: Brigade crossing H-hour T+25 confirmed. Bridge must be intact. Report bridgehead status." } } },
+    { "id": "IB-15", "atS": 1080, "title": "Second jammer covers bridge approaches", "action": { "kind": "JAMMER", "jammer": { "id": "J-RED-2", "label": "Hostile jammer (bridge)", "cell": "E7", "radius": 2.5, "bands": ["VHF", "UHF"], "power": 1.2, "active": true } } }
+  ],
+  "probeBank": [
+    { "kind": "HOSTILE_COUNT", "cell": "D6" },
+    { "kind": "FEATURE_STATUS", "featureId": "bridge-e5" },
+    { "kind": "FRIENDLY_LOCATION", "role": "PL_B" },
+    { "kind": "DECOY_ASSESS", "cell": "D6" },
+    { "kind": "HOSTILE_LOCATION", "unitId": "r-armour-1", "label": "main hostile armour group" },
+    { "kind": "HOSTILE_COUNT", "cell": "E6" }
+  ]
+}

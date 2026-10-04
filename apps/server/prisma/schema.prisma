@@ -1,0 +1,55 @@
+// VANGUARD OPS — persistence. Only INPUT events are stored (append-only);
+// derived sim outputs are re-derived by deterministic replay (DECISIONS D-002).
+
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "debian-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Session {
+  id                    String    @id
+  code                  String    @unique
+  scenarioId            String
+  seed                  Int
+  status                String
+  pinHash               String
+  instructorTokenHashes String[]
+  enabledRoles          String[]
+  scenario              Json
+  createdAt             DateTime  @default(now())
+  endedAt               DateTime?
+  events                Event[]
+  players               Player[]
+}
+
+model Player {
+  id        String   @id @default(cuid())
+  sessionId String
+  roleId    String
+  callsign  String
+  tokenHash String
+  joinedAt  DateTime @default(now())
+  session   Session  @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  @@unique([sessionId, roleId])
+}
+
+model Event {
+  id        String   @id
+  sessionId String
+  seq       Int
+  tSimMs    Int
+  tWall     DateTime
+  type      String
+  actor     String
+  payload   Json
+  session   Session  @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  @@unique([sessionId, seq])
+  @@index([sessionId])
+}

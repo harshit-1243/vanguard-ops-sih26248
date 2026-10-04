@@ -8,13 +8,24 @@
     "build": "tsup",
     "start": "node dist/index.js",
     "typecheck": "tsc -p tsconfig.json",
-    "test": "vitest run"
+    "test": "vitest run",
+    "postinstall": "prisma generate",
+    "db:migrate": "prisma migrate deploy"
   },
   "dependencies": {
+    "@fastify/static": "^8",
+    "@prisma/client": "^6",
     "@vanguard/shared": "workspace:*",
-    "@vanguard/sim": "workspace:*"
+    "@vanguard/sim": "workspace:*",
+    "fastify": "^5",
+    "pdfkit": "^0.15",
+    "prisma": "^6",
+    "socket.io": "^4.8",
+    "zod": "^3.24"
   },
   "devDependencies": {
+    "@types/pdfkit": "^0.17.6",
+    "socket.io-client": "^4.8",
     "tsup": "^8.3.5",
     "tsx": "^4.19.2",
     "vitest": "^3.0.0"
