@@ -195,7 +195,7 @@ spectrum (EW only, partial), airStatus (ALO only, partial) }`.
 ```
 **Input events (persisted, replayed):** SESSION_CREATED {scenario snapshot, seed, enabledRoles} ·
 ROLE_JOINED · ROLE_LEFT · EXERCISE_STARTED · EXERCISE_PAUSED · EXERCISE_RESUMED · SPEED_SET ·
-EXERCISE_ENDED · INJECT_FIRED · MSEL_EDITED · MSEL_SKIPPED · JAMMER_PLACED · JAMMER_MOVED ·
+EXERCISE_ENDED · INTENT_SET · INJECT_FIRED · MSEL_FIRED · MSEL_EDITED · MSEL_SKIPPED · JAMMER_PLACED · JAMMER_MOVED ·
 JAMMER_TOGGLED · JAMMER_REMOVED · CYBER_TRIGGERED · MESSAGE_SENT · INTEL_FORWARDED ·
 CONFLICT_FLAGGED · VERIFICATION_REQUESTED · PACE_SWITCHED · DECISION_MADE · INTENT_UPDATED ·
 FREQ_HOP · PROBE_STARTED · PROBE_ANSWERED · PROBE_ENDED.
@@ -260,11 +260,11 @@ For LOS-sensitive channels, a leg is DENIED if the segment between endpoints pas
 - `GPS_SPOOF(role, driftCells, durationS)`: role's own-unit **perceived** position (and its POSREPs) offset by a deterministic vector of length `driftCells`, ramping in over 60 s; movement orders issued during spoofing land at `target − drift` in truth.
 
 ### 7.7 Information generation (truth → reports)
-- **Sensors** (UAV, ground sensor, coastal radar, observation post) sweep every `intervalS`, observe hostile units within `rangeCells` (truth position), and emit CONTACT reports grouped by cell and perceived type. Decoys appear as their `displayType` unless `discriminatesDecoys`; discriminating ground sensors emit NEGATIVE ("no heavy-vehicle signature") for covered cells with no real vehicles — a natural UAV-vs-sensor conflict. Reports are sent on change and every 5th sweep.
+- **Sensors** (UAV, ground sensor, coastal radar, observation post) sweep every `intervalS`, observe hostile units within `rangeCells` (truth position), and emit CONTACT reports grouped by cell and perceived type. Decoys appear as their `displayType` unless `discriminatesDecoys`; discriminating ground sensors emit NEGATIVE ("no heavy-vehicle signature") for covered cells with no real vehicles — a natural UAV-vs-sensor conflict. Reports are sent on change and every 5th sweep (refresh, so a dropped report is eventually re-sent).
 - **Own observation**: each blue unit observes hostiles within its visual range (1 cell; recce 2) every 30 s into its owner's picture (OWN OBS, no channel); within 0.6 cells decoys are recognised as "possible decoys".
 - **POSREPs**: each role's unit auto-reports its (perceived) position to its superior every 60 s via its active channel.
 - **Scripted reports** from scenario (e.g., naval ISR via SATCOM).
-- **Conflict detection** (projection): two delivered items conflict if cells are equal (or adjacent for CONTACT-vs-CONTACT), observed within 600 s of each other, and they disagree (CONTACT vs NEGATIVE; type mismatch; count differs by ≥ 2).
+- **Conflict detection** (projection): two delivered items from *different sources* conflict if observed within 600 s of each other and either (a) same cell and they disagree (CONTACT vs NEGATIVE/zero-recon; type mismatch; count differs by ≥ 2), or (b) adjacent cells, both CONTACT with identical type and count within 60 s ("same group reported at two locations" — catches displaced/spoofed copies).
 
 ## 8. Adjudication rules (table-driven, deterministic, explainable)
 
