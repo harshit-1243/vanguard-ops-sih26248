@@ -1,1 +1,89 @@
 @import 'tailwindcss';
+@import '@fontsource/ibm-plex-sans/400.css';
+@import '@fontsource/ibm-plex-sans/500.css';
+@import '@fontsource/ibm-plex-sans/600.css';
+@import '@fontsource/ibm-plex-mono/400.css';
+@import '@fontsource/ibm-plex-mono/500.css';
+
+/* Ops-room palette: restrained slate, one amber accent (DS actions), force colours always
+   paired with shape/text so colour is never the only signal. */
+@theme {
+  --font-sans: 'IBM Plex Sans', system-ui, sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, SFMono-Regular, monospace;
+
+  --color-bg: #0d1217;
+  --color-panel: #131a21;
+  --color-panel2: #19222b;
+  --color-raised: #212c37;
+  --color-line: #2b3743;
+  --color-ink: #dce3ea;
+  --color-muted: #93a1af;
+  --color-faint: #6a7784;
+
+  --color-accent: #e5a940;
+  --color-accent-ink: #1a1306;
+  --color-blue: #63a2e6;
+  --color-red: #e5675a;
+  --color-unk: #d6bd55;
+  --color-ok: #52b984;
+  --color-warn: #e0a83c;
+  --color-bad: #e5675a;
+
+  --color-t-open: #1b242d;
+  --color-t-forest: #1c3026;
+  --color-t-urban: #282d34;
+  --color-t-river: #1b3a55;
+  --color-t-sea: #142d47;
+  --color-t-ridge: #3a3026;
+  --color-t-marsh: #20302b;
+  --color-t-hills: #2a3128;
+  --color-t-bridge: #4b4f55;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  background: var(--color-bg);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  font-size: 14px;
+  -webkit-font-smoothing: antialiased;
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+::selection {
+  background: color-mix(in srgb, var(--color-accent) 35%, transparent);
+}
+
+/* Thin scrollbars for dense panels */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-line) transparent;
+}
+
+.stripes-bad {
+  background-image: repeating-linear-gradient(
+    -45deg,
+    color-mix(in srgb, var(--color-bad) 22%, transparent) 0 10px,
+    color-mix(in srgb, var(--color-bad) 8%, transparent) 10px 20px
+  );
+}
+
+.tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation: none !important;
+    transition: none !important;
+  }
+}
