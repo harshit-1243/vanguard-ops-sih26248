@@ -9,8 +9,12 @@
 - TypeScript strict, ESLint 9 flat config, Prettier, Vitest; `.gitignore`, `.env.example`, `CLAUDE.md`.
 - Gate: lint ✅ typecheck ✅ tests ✅ (smoke tests).
 
+## Phase 1 — PRD ✅ (2026-10-04)
+- `docs/PRD.md` (18 sections, traceability matrix, G/W/T criteria, formulas), `docs/ARCHITECTURE.md` (Mermaid), `docs/DECISIONS.md` (D-001…D-013).
+- Notable deviation: SVG tactical grid map instead of MapLibre (D-001).
+
 ## Pending
-- Phase 1 PRD → Phase 12 handover.
+- Phase 2 sim engine → Phase 12 handover.
 
 ## Known issues
 - None yet.
