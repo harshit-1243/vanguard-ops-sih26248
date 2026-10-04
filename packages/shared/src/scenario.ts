@@ -106,7 +106,7 @@ export type NodeSpec = z.infer<typeof NodeSpecSchema>;
 
 export const FeatureSpecSchema = z.object({
   id: z.string().min(1).max(40),
-  kind: z.enum(['BRIDGE', 'DEPOT', 'LANDING_ZONE']),
+  kind: z.enum(['BRIDGE', 'DEPOT', 'LANDING_ZONE', 'PASS']),
   label: z.string().min(1).max(60),
   cell: CellSchema,
   destroyAtS: z.number().int().min(0).optional(),

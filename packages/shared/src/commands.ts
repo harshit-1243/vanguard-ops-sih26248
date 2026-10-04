@@ -7,6 +7,7 @@ import {
   JammerSpecSchema,
   RoleIdSchema,
   SpeedSchema,
+  UnitTypeSchema,
 } from './domain';
 import { CallsignSchema, DecisionPayloadSchema } from './events';
 
@@ -74,6 +75,12 @@ export const CreateSessionBodySchema = z.object({
   enabledRoles: z.array(RoleIdSchema).min(2).max(6).optional(),
 });
 export type CreateSessionBody = z.infer<typeof CreateSessionBodySchema>;
+
+export const ReportVariantsBodySchema = z.object({
+  cell: CellSchema,
+  unitType: UnitTypeSchema.default('ARMOUR'),
+  count: z.number().int().min(0).max(40).default(5),
+});
 
 export const JoinBodySchema = z.object({ roleId: RoleIdSchema, callsign: CallsignSchema });
 export type JoinBody = z.infer<typeof JoinBodySchema>;

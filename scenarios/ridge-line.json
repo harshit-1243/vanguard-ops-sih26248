@@ -1,0 +1,124 @@
+{
+  "id": "ridge-line",
+  "title": "Ridge Line",
+  "theatre": "Mountain · high-altitude pass",
+  "summary": "KESTREL Company must hold PASS NANDI against a hostile infiltration while the ridge itself cuts radio line-of-sight. GPS spoofing walks PL A off the map, a key report on a hostile supply convoy arrives five minutes late, and the pass and the forward supply dump cannot both be held by the same platoon.",
+  "durationMin": 30,
+  "defaultSeed": 4417,
+  "brief": {
+    "situation": "A hostile infantry company is infiltrating from the east towards PASS NANDI (D5), the only gap in the ridge line that runs north–south along column D. A hostile resupply convoy is expected to follow. Cloud is lowering; air support is limited to one sortie from T+10, and only if the ALO requests it. The ridge masks VHF line-of-sight between the company HQ and any element east of it.",
+    "mission": "KESTREL Company holds PASS NANDI (D5) until T+25 to deny the valley route, and protects the forward supply dump (B7).",
+    "execution": "KESTREL 1 (PL A) holds the observation post at E2 forward of the ridge and reports. KESTREL 2 (PL B) holds C6 covering both the pass approach and the dump. HAWK 1 (ALO) controls UAV RAVEN and the single CAS sortie. SPECTRE (EW) manages PACE and can move the rebro onto the ridge to restore VHF.",
+    "sustainment": "Forward supply dump at B7. Runners from B4.",
+    "command": "PACE: CMD NET → alternate net → HF NET → RUNNER. Expect VHF to fail across the ridge — plan relays. If cut off, act on the commander's intent."
+  },
+  "terrain": [
+    "H.F^..HH",
+    "...^.^..",
+    ".F.^.^F.",
+    "...^....",
+    ".F..H...",
+    "...^.M..",
+    "..F^..F.",
+    "UU.^...."
+  ],
+  "features": [
+    { "id": "pass-nandi", "kind": "PASS", "label": "PASS NANDI", "cell": "D5" },
+    { "id": "dump-b7", "kind": "DEPOT", "label": "SUPPLY DUMP", "cell": "B7", "destroyAtS": 1500, "unlessBlueIn": ["B7", "B6", "C6", "C7"] }
+  ],
+  "intent": {
+    "text": "Hold PASS NANDI (D5) until T+25 so the hostile company cannot use the valley route. Keep the supply dump at B7 intact. Preserve the company — do not get drawn east beyond the G column. If cut off, deny the pass first; the dump is second priority.",
+    "objectiveCells": ["D5"],
+    "forbiddenCells": ["H4", "H5", "H6"],
+    "priority": "DEFEND",
+    "deadlineS": 1500
+  },
+  "objectives": [
+    { "id": "obj-pass", "text": "Hold PASS NANDI", "cell": "D5" },
+    { "id": "obj-dump", "text": "Keep supply dump intact", "cell": "B7" }
+  ],
+  "roles": [
+    {
+      "id": "CDR", "title": "Sub-unit Commander", "callsign": "KESTREL 6", "superior": "HHQ", "unitId": "b-hq",
+      "pace": ["CMD_NET", "SATCOM", "HF_NET", "RUNNER"],
+      "description": "Behind the ridge at B4. Must decide how to split the company between the pass and the dump with a partial picture."
+    },
+    {
+      "id": "PL_A", "title": "Platoon Commander A", "callsign": "KESTREL 1", "superior": "CDR", "unitId": "b-pla",
+      "pace": ["CMD_NET", "PL_NET_A", "HF_NET", "RUNNER"],
+      "description": "Forward OP at E2, east of the ridge. VHF to the HQ is masked from the start; your GPS will be spoofed."
+    },
+    {
+      "id": "PL_B", "title": "Platoon Commander B", "callsign": "KESTREL 2", "superior": "CDR", "unitId": "b-plb",
+      "pace": ["CMD_NET", "PL_NET_B", "HF_NET", "RUNNER"],
+      "description": "At C6 covering the pass approach and the supply dump. You cannot be in both places."
+    },
+    {
+      "id": "ALO", "title": "Air Liaison / ISR Officer", "callsign": "HAWK 1", "superior": "CDR", "unitId": "b-tacp",
+      "pace": ["CMD_NET", "SATCOM", "HF_NET", "RUNNER"],
+      "description": "Controls UAV RAVEN and the single CAS sortie (from T+10, weather permitting, only if requested)."
+    },
+    {
+      "id": "EW", "title": "EW / Signals Officer", "callsign": "SPECTRE", "superior": "CDR", "unitId": "b-ew",
+      "pace": ["CMD_NET", "PL_NET_B", "HF_NET", "RUNNER"],
+      "description": "Owns the rebro. Putting it on the ridge restores VHF across it; hostile jammers will appear on the spur."
+    }
+  ],
+  "nodes": [
+    { "id": "HHQ", "label": "BLUE Brigade HQ", "pos": { "x": -2, "y": 4 } },
+    { "id": "REBRO-1", "label": "Rebro (valley)", "cell": "C4", "relay": true }
+  ],
+  "units": [
+    { "id": "b-hq", "side": "BLUE", "callsign": "KESTREL 6", "type": "HQ", "count": 3, "strength": 60, "ownerRole": "CDR", "waypoints": [{ "atS": 0, "cell": "B4" }] },
+    { "id": "b-pla", "side": "BLUE", "callsign": "KESTREL 1", "type": "INFANTRY", "count": 3, "strength": 100, "ownerRole": "PL_A", "waypoints": [{ "atS": 0, "cell": "E2" }] },
+    { "id": "b-plb", "side": "BLUE", "callsign": "KESTREL 2", "type": "INFANTRY", "count": 3, "strength": 100, "ownerRole": "PL_B", "waypoints": [{ "atS": 0, "cell": "C6" }] },
+    { "id": "b-tacp", "side": "BLUE", "callsign": "HAWK 1", "type": "TACP", "count": 1, "strength": 20, "ownerRole": "ALO", "waypoints": [{ "atS": 0, "cell": "B4" }] },
+    { "id": "b-ew", "side": "BLUE", "callsign": "SPECTRE", "type": "EW_DET", "count": 1, "strength": 20, "ownerRole": "EW", "waypoints": [{ "atS": 0, "cell": "B5" }] },
+    {
+      "id": "r-inf-1", "side": "RED", "callsign": "HOSTILE INFANTRY COY", "type": "INFANTRY", "count": 6, "strength": 120,
+      "waypoints": [{ "atS": 0, "cell": "H5" }, { "atS": 420, "cell": "G5" }, { "atS": 840, "cell": "F5" }, { "atS": 1140, "cell": "E5" }, { "atS": 1440, "cell": "D5" }]
+    },
+    { "id": "r-recce-1", "side": "RED", "callsign": "HOSTILE PATROL", "type": "RECCE", "count": 2, "strength": 30, "waypoints": [{ "atS": 0, "cell": "H2" }, { "atS": 480, "cell": "F2" }, { "atS": 900, "cell": "E3" }] },
+    { "id": "r-decoy-1", "side": "RED", "callsign": "DUMMY POSITION F4", "type": "MECH", "count": 4, "strength": 0, "decoy": true, "waypoints": [{ "atS": 0, "cell": "F4" }] },
+    { "id": "r-mortar-1", "side": "RED", "callsign": "HOSTILE MORTAR LINE", "type": "ARTILLERY", "count": 3, "strength": 50, "waypoints": [{ "atS": 0, "cell": "G6" }] },
+    { "id": "r-convoy-1", "side": "RED", "callsign": "HOSTILE RESUPPLY CONVOY", "type": "CONVOY", "count": 6, "strength": 30, "waypoints": [{ "atS": 0, "cell": "H8" }, { "atS": 600, "cell": "G7" }, { "atS": 1200, "cell": "G6" }, { "atS": 1600, "cell": "F5" }] },
+    { "id": "r-raid-1", "side": "RED", "callsign": "HOSTILE RAIDERS", "type": "INFANTRY", "count": 2, "strength": 40, "waypoints": [{ "atS": 0, "cell": "E8" }, { "atS": 900, "cell": "D8" }, { "atS": 1400, "cell": "C8" }] }
+  ],
+  "sensors": [
+    { "id": "uav-raven", "kind": "UAV", "label": "UAV RAVEN", "channel": "ISR_DATALINK", "cell": "F4", "rangeCells": 2.5, "intervalS": 45, "deliverTo": ["ALO", "CDR"], "ownerRole": "ALO" },
+    { "id": "ugs-pass", "kind": "GROUND_SENSOR", "label": "UGS PASS NANDI", "channel": "GROUND_SENSOR", "cell": "E5", "rangeCells": 1.0, "intervalS": 60, "deliverTo": ["CDR", "PL_B"], "discriminatesDecoys": true, "reportsNegatives": true },
+    { "id": "op-ridge", "kind": "OP", "label": "OP RIDGE (D2)", "channel": "GROUND_SENSOR", "cell": "D2", "rangeCells": 2, "intervalS": 90, "deliverTo": ["CDR", "PL_A"] }
+  ],
+  "air": { "availableFromS": 600, "responseS": 180, "sorties": 1 },
+  "scriptedReports": [
+    {
+      "atS": 90, "from": "HHQ", "fromLabel": "HHQ INTSUM", "channel": "SATCOM", "to": ["CDR"], "kind": "INFO", "confidence": "M",
+      "text": "INTSUM 1. Hostile infantry company moving west through the G column towards PASS NANDI. Dummy positions reported in the area. Resupply convoy expected to follow."
+    }
+  ],
+  "msel": [
+    { "id": "RL-01", "atS": 120, "title": "GPS spoofing in the valley", "note": "PL A's believed position drifts ~2 km.", "action": { "kind": "CYBER", "cyber": { "kind": "GPS_SPOOF", "role": "PL_A", "durationS": 600, "driftCells": 2 } } },
+    { "id": "RL-02", "atS": 180, "title": "Weather warning", "action": { "kind": "REPORT", "report": { "from": "HHQ", "fromLabel": "HHQ MET", "channel": "SATCOM", "to": ["CDR", "ALO"], "kind": "INFO", "confidence": "H", "text": "MET: cloud base lowering. Only one CAS sortie available from T+10; UAV performance may degrade later." } } },
+    { "id": "RL-03", "atS": 240, "title": "HF skip zone in the mountains", "action": { "kind": "INJECT", "inject": { "type": "INTERMITTENT", "channels": ["HF_NET"], "roles": [], "durationS": 300, "params": { "periodS": 40 }, "label": "HF skip zone" } } },
+    { "id": "RL-04", "atS": 300, "title": "Conflicting reports at the pass", "action": { "kind": "INJECT", "inject": { "type": "CONFLICT", "channels": ["GROUND_SENSOR"], "roles": ["CDR"], "durationS": 120, "params": { "targetCell": "E5" }, "label": "Conflicting UGS reports E5" } } },
+    { "id": "RL-05", "atS": 360, "title": "UAV ground-station backlog", "action": { "kind": "INJECT", "inject": { "type": "STALE", "channels": ["ISR_DATALINK"], "roles": ["ALO"], "durationS": 240, "params": { "staleS": 240 }, "label": "UAV imagery 4 min stale" } } },
+    { "id": "RL-06", "atS": 420, "title": "Hostile jammer on the spur", "action": { "kind": "JAMMER", "jammer": { "id": "J-RL-1", "label": "Hostile jammer (spur)", "cell": "F3", "radius": 2.5, "bands": ["VHF", "UHF"], "power": 1, "active": true } } },
+    { "id": "RL-07", "atS": 540, "title": "SATCOM congestion — convoy report delayed 5 min", "note": "The convoy sighting (RL-08) reaches the CP about five minutes late.", "action": { "kind": "INJECT", "inject": { "type": "DELAY", "channels": ["SATCOM"], "roles": [], "durationS": 360, "params": { "delayS": 300 }, "label": "SATCOM congestion" } } },
+    { "id": "RL-08", "atS": 600, "title": "HHQ: hostile resupply convoy sighted", "action": { "kind": "REPORT", "report": { "from": "HHQ", "fromLabel": "HHQ INT", "channel": "SATCOM", "to": ["CDR", "ALO"], "kind": "CONTACT", "cell": "G7", "unitType": "CONVOY", "count": 6, "confidence": "H", "text": "HHQ: hostile resupply convoy, 6 vehicles, GRID G7, moving north towards the pass. Priority air target." } } },
+    { "id": "RL-09", "atS": 660, "title": "Imitative deception behind PL B", "action": { "kind": "INJECT", "inject": { "type": "SPOOF", "channels": ["CMD_NET"], "roles": ["PL_B"], "durationS": 120, "params": { "targetCell": "C5" }, "label": "False contact C5" } } },
+    { "id": "RL-10", "atS": 720, "title": "PL net B failing silently", "action": { "kind": "INJECT", "inject": { "type": "MISSING", "channels": ["PL_NET_B"], "roles": [], "durationS": 180, "params": {}, "label": "PL NET B silent loss" } } },
+    { "id": "RL-11", "atS": 780, "title": "UAV datalink compromised", "action": { "kind": "CYBER", "cyber": { "kind": "DATALINK_COMPROMISE", "durationS": 120 } } },
+    { "id": "RL-12", "atS": 900, "title": "PL A radio failure", "action": { "kind": "INJECT", "inject": { "type": "DROPOUT", "channels": ["CMD_NET"], "roles": ["PL_A"], "durationS": 240, "params": {}, "label": "PL A set failure" } } },
+    { "id": "RL-13", "atS": 960, "title": "C2 outage (digital)", "action": { "kind": "CYBER", "cyber": { "kind": "C2_OUTAGE", "durationS": 90 } } },
+    { "id": "RL-14", "atS": 1080, "title": "Spur jammer off air", "action": { "kind": "JAMMER_TOGGLE", "jammerId": "J-RL-1", "active": false } },
+    { "id": "RL-15", "atS": 1140, "title": "Jammer covers the pass", "action": { "kind": "JAMMER", "jammer": { "id": "J-RL-2", "label": "Hostile jammer (pass)", "cell": "E6", "radius": 2, "bands": ["VHF", "HF"], "power": 1.2, "active": true } } }
+  ],
+  "probeBank": [
+    { "kind": "FRIENDLY_LOCATION", "role": "PL_A" },
+    { "kind": "HOSTILE_COUNT", "cell": "F4" },
+    { "kind": "FEATURE_STATUS", "featureId": "dump-b7" },
+    { "kind": "HOSTILE_LOCATION", "unitId": "r-convoy-1", "label": "hostile resupply convoy" },
+    { "kind": "DECOY_ASSESS", "cell": "F4" },
+    { "kind": "HOSTILE_LOCATION", "unitId": "r-inf-1", "label": "main hostile infantry company" }
+  ]
+}

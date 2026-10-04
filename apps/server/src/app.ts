@@ -7,6 +7,7 @@ import {
   CreateSessionBodySchema,
   InstructorLoginBodySchema,
   JoinBodySchema,
+  ReportVariantsBodySchema,
   RoleIdSchema,
   SessionCodeSchema,
 } from '@vanguard/shared';
@@ -15,6 +16,7 @@ import { RateLimiter } from './auth';
 import { renderAarPdf } from './pdf';
 import type { Config } from './config';
 import { attachGateway } from './gateway';
+import { createProvider, makeEnricher, reportVariants, type LlmProvider } from './llm';
 import { NotFound, SessionManager } from './manager';
 import { ScenarioRegistry } from './scenarios';
 import type { LiveSession, SessionActor } from './session';
@@ -42,7 +44,11 @@ export function bearer(req: FastifyRequest): string | null {
   return typeof q === 'string' ? q : null;
 }
 
-export async function buildApp(config: Config, store?: EventStore, opts: { enrichAar?: AarEnricher } = {}): Promise<AppContext> {
+export async function buildApp(
+  config: Config,
+  store?: EventStore,
+  opts: { enrichAar?: AarEnricher; llm?: LlmProvider | null } = {},
+): Promise<AppContext> {
   const app = Fastify({
     logger: config.LOG_LEVEL === 'silent' ? false : { level: config.LOG_LEVEL },
     bodyLimit: 256 * 1024,
@@ -54,6 +60,8 @@ export async function buildApp(config: Config, store?: EventStore, opts: { enric
     tickHz: config.TICK_HZ,
     onError: (err) => app.log.error(err, 'session error'),
   });
+  const llm: LlmProvider | null = opts.llm !== undefined ? opts.llm : createProvider(config);
+  const enrichAar = opts.enrichAar ?? makeEnricher(llm, app.log);
   const pinLimiter = new RateLimiter(5, 60_000);
   const demoLimiter = new RateLimiter(3, 60_000);
 
@@ -159,17 +167,26 @@ export async function buildApp(config: Config, store?: EventStore, opts: { enric
 
   app.decorate('requireAarAccess', requireAarAccess);
 
+  // ---- Optional AI layer ----
+  app.get('/api/ai/status', async () => ({ provider: llm?.name ?? 'none', enabled: !!llm }));
+  app.post('/api/sessions/:code/ai/report-variants', async (req, reply) => {
+    const s = await sessionOr404((req.params as { code: string }).code);
+    if (s.resolveToken(bearer(req)) !== 'DS') return reply.code(401).send({ error: 'DS only' });
+    const body = ReportVariantsBodySchema.parse(req.body ?? {});
+    return reportVariants(llm, body, s.sim.state.tMs);
+  });
+
   // ---- AAR & exports (US-AAR-8/9) ----
   const fileName = (s: LiveSession, ext: string) => `vanguard-aar-${s.scenario.id}-${s.code}.${ext}`;
   app.get('/api/sessions/:code/aar', async (req, reply) => {
     const s = await requireAarAccess(req, reply);
     if (!s) return reply;
-    return aarFor(s, opts.enrichAar);
+    return aarFor(s, enrichAar);
   });
   app.get('/api/sessions/:code/aar.pdf', async (req, reply) => {
     const s = await requireAarAccess(req, reply);
     if (!s) return reply;
-    const pdf = await renderAarPdf(await aarFor(s, opts.enrichAar));
+    const pdf = await renderAarPdf(await aarFor(s, enrichAar));
     return reply
       .header('content-type', 'application/pdf')
       .header('content-disposition', `attachment; filename="${fileName(s, 'pdf')}"`)

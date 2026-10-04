@@ -45,8 +45,14 @@
 - Tests: 7 sim AAR tests (formulas, every sustain/improve branch, replay), 7 server tests incl. **PDF text extraction asserting decision cards** (pdf-parse). Sim coverage 99.4 % lines / 91.5 % branches.
 - Visually reviewed the PDF (6 pages) via PyMuPDF rasterisation.
 
+## Phase 7 — Scenarios + AI layer ✅ (2026-10-05)
+- **Ridge Line** authored: ridge along column D masks VHF (LOS) between HQ and the forward OP, single pass D5, GPS spoof on PL A, convoy report delayed ~5 min by SATCOM congestion, pass-vs-dump dilemma, 15 MSEL items.
+- Scenario tests: both templates validate, MSEL ≥ 12 covering all 7 inject types + jammer + all 3 cyber kinds, full-length (30 min) runs with decisions/probes and a truth-leak sweep for every role, Ridge-specific mechanics (LOS mask, GPS drift, 5-min convoy delay).
+- AI layer (`apps/server/src/llm.ts`): provider abstraction none | ollama | anthropic (official SDK, claude-opus-5-5, low effort, server-side refusal fallbacks). AAR narrative + per-decision coaching drafts (≤12, concurrency 3), report variants (SALUTE / contact / SITREP + contradictory pair) at `POST /api/sessions/:code/ai/report-variants`; DS composer "Draft texts" for CONFLICT injects (texts recorded in the event log). Template fallback on any failure; all AI output labelled.
+- Tests: 8 AI tests with fake/mocked providers (no network). Real Anthropic/Ollama calls were **not** exercised (no key / no Ollama locally) — adapters verified against mocked transports only.
+
 ## Pending
-- Phase 7 scenarios + AI → Phase 12 handover.
+- Phase 8 E2E + a11y → Phase 12 handover.
 
 ## Known issues
 - None yet.

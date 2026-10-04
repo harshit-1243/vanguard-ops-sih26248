@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Bug, Zap } from 'lucide-react';
+import { Bug, Sparkles, Zap } from 'lucide-react';
 import {
   CHANNEL_IDS,
   INJECT_TYPES,
@@ -12,7 +12,10 @@ import {
 } from '@vanguard/shared';
 import { Badge, Button, Empty, Input, Label, SectionTitle, Select } from '@/components/ui/primitives';
 import type { Cmd } from '@/components/trainee/parts';
+import { api } from '@/lib/api';
+import { loadIdentity } from '@/lib/identity';
 import { cn } from '@/lib/utils';
+import { Textarea } from '@/components/ui/primitives';
 
 export const INJECT_HELP: Record<InjectType, string> = {
   DELAY: 'Traffic on the channel(s) arrives late by the given seconds.',
@@ -43,6 +46,8 @@ export function InjectComposer({ t, cmd }: { t: InstructorState; cmd: Cmd }) {
   const [staleS, setStaleS] = useState(300);
   const [targetCell, setTargetCell] = useState('');
   const [label, setLabel] = useState('');
+  const [texts, setTexts] = useState<[string, string] | null>(null);
+  const [draftSource, setDraftSource] = useState<string | null>(null);
   const live = t.phase === 'RUNNING' || t.phase === 'PAUSED';
   const toggle = <T,>(list: T[], v: T) => (list.includes(v) ? list.filter((x) => x !== v) : [...list, v]);
 
@@ -51,6 +56,14 @@ export function InjectComposer({ t, cmd }: { t: InstructorState; cmd: Cmd }) {
   if (type === 'INTERMITTENT') params.periodS = periodS;
   if (type === 'STALE') params.staleS = staleS;
   if ((type === 'CONFLICT' || type === 'SPOOF') && targetCell) params.targetCell = targetCell;
+  if (type === 'CONFLICT' && targetCell && texts && texts[0].trim().length >= 3 && texts[1].trim().length >= 3) params.reportTexts = texts;
+
+  const draft = async () => {
+    const token = loadIdentity(t.sessionCode)?.token ?? '';
+    const r = await api.post<{ source: string; provider: string | null; contradictory: [string, string] }>(`/api/sessions/${t.sessionCode}/ai/report-variants`, { cell: targetCell }, token);
+    setTexts(r.contradictory);
+    setDraftSource(r.source === 'ai' ? `AI-generated draft (${r.provider})` : 'template');
+  };
 
   const preview = `${type}${type === 'DELAY' ? ` +${delayS}s` : type === 'INTERMITTENT' ? ` period ${periodS}s` : type === 'STALE' ? ` ${staleS}s old` : ''} on ${channels.join(', ') || '—'} → ${targetRoles.length ? targetRoles.join(', ') : 'all stations'} for ${durationS}s${params.targetCell ? ` @ ${String(params.targetCell)}` : ''}. ${INJECT_HELP[type]}`;
 
@@ -100,6 +113,20 @@ export function InjectComposer({ t, cmd }: { t: InstructorState; cmd: Cmd }) {
           </div>
         )}
       </div>
+      {type === 'CONFLICT' && targetCell && (
+        <div className="grid gap-1.5 rounded border border-line p-2">
+          <div className="flex items-center justify-between">
+            <span className="text-[11px] text-muted">Contradictory pair texts {draftSource && <span className="text-faint">· {draftSource}</span>}</span>
+            <Button size="xs" variant="outline" onClick={() => void draft()}><Sparkles size={11} /> Draft texts</Button>
+          </div>
+          {texts && (
+            <>
+              <Textarea aria-label="Report A text" rows={2} value={texts[0]} onChange={(e) => setTexts([e.target.value, texts[1]])} />
+              <Textarea aria-label="Report B text" rows={2} value={texts[1]} onChange={(e) => setTexts([texts[0], e.target.value])} />
+            </>
+          )}
+        </div>
+      )}
       <div>
         <Label htmlFor="inj-label">Label (DS only)</Label>
         <Input id="inj-label" maxLength={120} placeholder="e.g. Hostile jamming of PL net" value={label} onChange={(e) => setLabel(e.target.value)} />

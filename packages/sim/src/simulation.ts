@@ -353,7 +353,7 @@ export class Simulation {
     journal(s, 'INJECT', `${source} inject ${id}: ${label}${spec.roles.length ? ` → ${spec.roles.join(',')}` : ''} (${spec.durationS}s)`, null, id);
     this.trigger(this.affectedRoles(spec.channels, spec.roles), `Inject ${spec.type}`);
     if (spec.type === 'CONFLICT' && spec.params.targetCell) {
-      conflictPair(this.ctx, spec.channels, spec.roles, spec.params.targetCell);
+      conflictPair(this.ctx, spec.channels, spec.roles, spec.params.targetCell, spec.params.reportTexts);
     }
   }
 

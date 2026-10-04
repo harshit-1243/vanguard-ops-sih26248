@@ -419,7 +419,7 @@ export function generateSpoofs(ctx: Ctx): void {
 }
 
 /** CONFLICT inject with a target cell: an immediate contradictory pair about that cell. */
-export function conflictPair(ctx: Ctx, channels: ChannelId[], roles: RoleId[], cell: Cell): void {
+export function conflictPair(ctx: Ctx, channels: ChannelId[], roles: RoleId[], cell: Cell, texts?: [string, string]): void {
   const s = ctx.s;
   for (const channel of channels) {
     const members = ctx.ch[channel].members.filter((m) => s.enabledRoles.includes(m as RoleId)) as RoleId[];
@@ -429,10 +429,10 @@ export function conflictPair(ctx: Ctx, channels: ChannelId[], roles: RoleId[], c
     const meta = { truthUnitIds: [], spoofed: true, decoyOnly: false, twin: true, stale: false };
     const fromPos = (r: RoleId) => perceivedOwnPos(ctx, r);
     sendReport(ctx, channel, 'INJECT', CHANNEL_SOURCE_LABEL[channel], to, () => ({
-      kind: 'CONTACT', cell, unitType: 'ARMOUR', count, confidence: 'M', meta,
+      kind: 'CONTACT', cell, unitType: 'ARMOUR', count, confidence: 'M', meta, text: texts?.[0],
     }), fromPos);
     sendReport(ctx, channel, 'INJECT', 'UNCONFIRMED', to, () => ({
-      kind: 'NEGATIVE', cell, unitType: null, count: 0, confidence: 'M', meta,
+      kind: 'NEGATIVE', cell, unitType: null, count: 0, confidence: 'M', meta, text: texts?.[1],
     }), fromPos);
   }
 }

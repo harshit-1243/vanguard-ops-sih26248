@@ -79,6 +79,8 @@ export const InjectSpecSchema = z.object({
       periodS: z.number().min(4).max(600).optional(),
       staleS: z.number().min(30).max(3600).optional(),
       targetCell: CellSchema.optional(),
+      /** Optional authored texts for a CONFLICT pair (e.g. AI-drafted, recorded in the log). */
+      reportTexts: z.tuple([z.string().min(3).max(300), z.string().min(3).max(300)]).optional(),
     })
     .default({}),
   label: z.string().max(120).optional(),
