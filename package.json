@@ -1,0 +1,36 @@
+{
+  "name": "vanguard-ops",
+  "version": "0.1.0",
+  "private": true,
+  "description": "VANGUARD OPS — multi-domain decision-making trainer for degraded communication environments (SIH 2026 · PS 26248)",
+  "type": "module",
+  "packageManager": "pnpm@9.15.9",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "dev": "pnpm -r --parallel --filter @vanguard/server --filter @vanguard/web dev",
+    "build": "pnpm -r build",
+    "lint": "eslint . --max-warnings=0",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "typecheck": "pnpm -r typecheck",
+    "test": "pnpm -r test",
+    "test:coverage": "pnpm --filter @vanguard/sim test:coverage",
+    "e2e": "playwright test",
+    "check": "pnpm lint && pnpm typecheck && pnpm test",
+    "start": "pnpm --filter @vanguard/server start",
+    "seed:demo": "pnpm --filter @vanguard/server seed:demo"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.17.0",
+    "@playwright/test": "^1.49.0",
+    "@types/node": "^20.17.0",
+    "eslint": "^9.17.0",
+    "eslint-plugin-react-hooks": "^5.1.0",
+    "globals": "^15.14.0",
+    "prettier": "^3.4.2",
+    "typescript": "~5.7.2",
+    "typescript-eslint": "^8.18.0"
+  }
+}

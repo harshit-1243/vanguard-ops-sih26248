@@ -1,0 +1,32 @@
+# deps / build
+node_modules/
+dist/
+coverage/
+*.tsbuildinfo
+
+# env & secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# test output
+playwright-report/
+test-results/
+blob-report/
+e2e/.artifacts/
+
+# local data
+*.db
+*.db-journal
+.data/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/*
+!.vscode/extensions.json
+.idea/
+*.log
