@@ -47,6 +47,7 @@ describe('map adapters', () => {
     expect(pct(0.256)).toBe('26%');
     expect(pct(null)).toBe('—');
     expect(num(0.1234)).toBe('0.12');
-    expect(cn('a', false && 'b', 'px-2 px-3')).toBe('a px-3');
+    const off = (x: string) => x.length > 99 && 'b';
+    expect(cn('a', off('x'), 'px-2 px-3')).toBe('a px-3');
   });
 });
