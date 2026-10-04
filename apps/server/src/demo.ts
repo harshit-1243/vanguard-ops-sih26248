@@ -81,8 +81,11 @@ export async function seedDemo(
     } else {
       const cmd = step.cmd;
       if (cmd.type === 'MAKE_DECISION') {
+        // Cite the freshest reports about the target sector, else the latest contacts.
         const intel = session.sim.state.roles[step.role]!.intel;
-        cmd.decision.basedOn = intel.slice(-2).map((i) => i.id);
+        const about = intel.filter((i) => i.cell === cmd.decision.targetCell && i.kind !== 'POSREP');
+        const contacts = intel.filter((i) => i.kind === 'CONTACT' || i.kind === 'NEGATIVE' || i.kind === 'RECON');
+        cmd.decision.basedOn = (about.length ? about : contacts).slice(-2).map((i) => i.id);
       }
       const r = session.traineeCommand(step.role, cmd);
       // Some scripted actions may be impossible under degradation (that is realistic) — record and move on.

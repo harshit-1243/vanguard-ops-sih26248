@@ -1,5 +1,6 @@
 import {
   cellCentre,
+  formatT,
   vecToCell,
   type ChannelId,
   type CyberSpec,
@@ -588,7 +589,7 @@ export class Simulation {
         unit.orderedCell = d.targetCell!;
         const actualCell = vecToCell(truePos);
         unit.engage = d.action === 'WITHDRAW' ? null : { decisionId: id, atMs: arrive, cell: actualCell, pos: truePos };
-        effect(`Moving to ${actualCell}${actualCell !== d.targetCell ? ` (GPS error: intended ${d.targetCell})` : ''}, ETA T+${Math.round(arrive / 1000)}s`);
+        effect(`Moving to ${actualCell}${actualCell !== d.targetCell ? ` (GPS error: intended ${d.targetCell})` : ''}, ETA ${formatT(arrive)}`);
         break;
       }
       case 'HOLD':
@@ -615,14 +616,14 @@ export class Simulation {
         if (role === 'ALO' && s.air.onStationAtMs === null) {
           s.air.onStationAtMs = Math.max(ctx.sc.air.availableFromS * 1000, s.tMs + ctx.sc.air.responseS * 1000);
           s.air.requestedBy = 'ALO';
-          journal(s, 'AIR', `ALO requested air — on station T+${Math.round(s.air.onStationAtMs / 1000)}s`, role);
-          effect(`Air requested; on station at T+${Math.round(s.air.onStationAtMs / 1000)}s`);
+          journal(s, 'AIR', `ALO requested air — on station ${formatT(s.air.onStationAtMs)}`, role);
+          effect(`Air requested; on station at ${formatT(s.air.onStationAtMs)}`);
         }
         const canStrike = airOnStation(ctx) || (role === 'ALO' && s.air.onStationAtMs !== null);
         if (canStrike && s.air.sortiesLeft > 0) {
           const at = Math.max(s.air.onStationAtMs ?? s.tMs, s.tMs) + STRIKE_DELAY_MS;
           s.scheduled.push({ id: nextId(s, 'S'), atMs: at, kind: 'STRIKE', role, cell: d.targetCell!, decisionId: id, label: 'AIR STRIKE' });
-          effect(`Strike on ${d.targetCell} scheduled T+${Math.round(at / 1000)}s`);
+          effect(`Strike on ${d.targetCell} scheduled ${formatT(at)}`);
         } else {
           effect('No air cover — no strike');
         }

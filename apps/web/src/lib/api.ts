@@ -45,6 +45,7 @@ export interface Briefing {
 }
 
 export const api = {
+  demo: () => request<CreateSessionResponse>('POST', '/api/demo', {}),
   scenarios: () => request<ScenarioSummary[]>('GET', '/api/scenarios'),
   create: (scenarioId: string, enabledRoles?: RoleId[], seed?: number) =>
     request<CreateSessionResponse>('POST', '/api/sessions', { scenarioId, enabledRoles, seed }),

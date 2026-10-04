@@ -1,5 +1,8 @@
-import { Link } from 'react-router-dom';
-import { ArrowRight, Radar, Shield, Users } from 'lucide-react';
+import { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { ArrowRight, FileBarChart, Radar, Shield, Users } from 'lucide-react';
+import { api } from '@/lib/api';
+import { saveIdentity } from '@/lib/identity';
 import { PageShell } from '@/components/shell';
 
 function Choice({ to, title, kicker, text, Icon, primary }: { to: string; title: string; kicker: string; text: string; Icon: typeof Shield; primary?: boolean }) {
@@ -22,6 +25,34 @@ function Choice({ to, title, kicker, text, Icon, primary }: { to: string; title:
         Continue <ArrowRight size={14} aria-hidden />
       </span>
     </Link>
+  );
+}
+
+function DemoLink() {
+  const [busy, setBusy] = useState(false);
+  const [err, setErr] = useState<string | null>(null);
+  const navigate = useNavigate();
+  return (
+    <span className="inline-flex flex-col">
+      <button
+        disabled={busy}
+        onClick={async () => {
+          setBusy(true);
+          try {
+            const d = await api.demo();
+            saveIdentity(d.code, { token: d.instructorToken, actor: 'DS', pin: d.pin });
+            navigate(`/aar/${d.code}`);
+          } catch (e) {
+            setErr((e as Error).message);
+            setBusy(false);
+          }
+        }}
+        className="inline-flex items-center gap-2 text-xs text-muted hover:text-ink disabled:opacity-50"
+      >
+        <FileBarChart size={13} aria-hidden /> {busy ? 'Playing a scripted demo exercise…' : 'See a finished demo exercise and its AAR'}
+      </button>
+      {err && <span role="alert" className="text-xs text-bad">{err}</span>}
+    </span>
   );
 }
 
@@ -57,6 +88,7 @@ export default function Landing() {
           <Link to="/ds-login" className="inline-flex items-center gap-2 text-xs text-muted hover:text-ink">
             <Radar size={13} aria-hidden /> DS on another machine? Log in with code + PIN
           </Link>
+          <DemoLink />
         </div>
       </section>
     </PageShell>

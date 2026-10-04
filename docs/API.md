@@ -21,9 +21,8 @@ accept `?token=` so browser downloads work.
 | GET | `/api/sessions/:code/events.json` | same | `{inputEvents, journal, stateHash}` |
 | GET | `/api/sessions/:code/decisions.csv` | same | `text/csv`, one row per decision |
 | GET | `/api/sessions/:code/replay?view=truth\|<role>&stepS=10` | same | `ReplayResponse` |
-| POST | `/api/sessions/:code/ai/report-variants` | DS | `{cell, unitType, count}` → contradictory pair |
-
-(AAR / export / replay / AI endpoints land in Phases 6–7.)
+| POST | `/api/demo` | – (3/min/IP) | plays the scripted Iron Bridge demo to the end → `{code, pin, instructorToken}` |
+| POST | `/api/sessions/:code/ai/report-variants` | DS | `{cell, unitType, count}` → contradictory pair (template or AI) |
 
 ## Socket.IO
 

@@ -36,10 +36,17 @@
 
 ## Phase 5 — Instructor dashboard ✅ (2026-10-04)
 - DS console: clock controls (start/pause/resume/×1/×2/×4/end with confirm), god view (truth units incl. decoys, jammer radii with inner/outer zones, role↔superior link lines by state, rebro), view-as-role switcher (renders the role's exact PerceivedPicture full width), map tools (place jammer dialog: radius/power/bands/label; move/toggle/remove), inject composer (7 types, channels, roles, duration, params, live preview), cyber controls (C2 outage, datalink compromise, GPS spoof role/drift), MSEL timeline (edit time, skip, fire now, due highlight), live decision feed with SOUND/RISKY/UNSOUND + expandable knowable-vs-truth, SAGAT probe (freeze → per-role progress/accuracy → score & resume) with SA-divergence heatmap, comms health + delivery stats, roster (presence, cut-off, GPS believed vs true, release role), truth journal.
-- Known: AAR page is a labelled placeholder until Phase 6.
+
+## Phase 6 — AAR ✅ (2026-10-05)
+- Sim `metrics.ts`: decision latency after triggers, verification of contested intel, Brier + over-confidence, intent adherence (overall / cut off) + self-awareness, SA per probe, divergence, comms, cut-off time, PACE response, outcome, rule-based sustain/improve (PRD §9.10).
+- Sim `aar.ts`: `buildAar` (4 AAR questions + exec summary), template narrative and per-decision rationale feedback (AI layer hooks in Phase 7), `buildReplay` (frames every N s, truth or any role view, rebuilt from the log).
+- Server: `/aar`, `/aar.pdf` (pdfkit, vector swimlane/bars/network, two-column hindsight-safe decision cards, disclaimer footer on every page), `/events.json`, `/decisions.csv`, `/replay`, access control (DS any time, trainees after END, `?token=` for downloads), `POST /api/demo` (rate-limited one-click finished demo).
+- Web AAR page: exec summary + KPI strip, Q1 brief/intent/MSEL, Q2 outcome + interactive swimlane (click → decision card) + replay scrubber (play/pause/×1/×4/×10, truth ↔ role toggle), Q3 metric table with ▲/▼ markers, bar charts, SA heatmaps, network graph, decision cards (knowable → reveal truth + feedback, role filter, reveal-all), Q4 sustain/improve + narrative (labelled template vs AI draft), PDF/JSON/CSV export.
+- Tests: 7 sim AAR tests (formulas, every sustain/improve branch, replay), 7 server tests incl. **PDF text extraction asserting decision cards** (pdf-parse). Sim coverage 99.4 % lines / 91.5 % branches.
+- Visually reviewed the PDF (6 pages) via PyMuPDF rasterisation.
 
 ## Pending
-- Phase 6 AAR → Phase 12 handover.
+- Phase 7 scenarios + AI → Phase 12 handover.
 
 ## Known issues
 - None yet.

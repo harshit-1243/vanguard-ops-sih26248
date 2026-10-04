@@ -116,7 +116,7 @@ export function Heatmap({ roles, matrix, label }: { roles: string[]; matrix: (nu
   return (
     <table className="mx-3 my-2 border-separate border-spacing-0.5 font-mono text-[10px]" aria-label={label}>
       <thead>
-        <tr><th /> {roles.map((r) => <th key={r} scope="col" className="px-1 font-normal text-muted">{r}</th>)}</tr>
+        <tr><th />{roles.map((r) => <th key={r} scope="col" className="px-1 font-normal text-muted">{r}</th>)}</tr>
       </thead>
       <tbody>
         {roles.map((r, i) => (

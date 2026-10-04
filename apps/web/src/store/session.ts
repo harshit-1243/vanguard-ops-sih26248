@@ -56,7 +56,7 @@ export const useSession = create<SessionState>((set, get) => ({
     socket.on('disconnect', () => set({ connected: false }));
     socket.on('connect_error', (err) => {
       if (err.message === 'unauthorized') {
-        set({ authError: 'Your session token is not valid for this exercise.' });
+        set({ authError: 'This exercise is not available with your token — it may have ended on a restarted server, or your seat was released.' });
         socket.close();
       }
     });

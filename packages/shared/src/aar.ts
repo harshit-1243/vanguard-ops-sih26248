@@ -136,7 +136,7 @@ export interface AarReport {
       objectives: { id: string; text: string; cell: Cell; held: boolean }[];
       friendlyStrengthPct: number;
       hostileStrengthPct: number;
-      features: { id: string; label: string; intact: boolean }[];
+      features: { id: string; label: string; kind: string; cell: Cell; intact: boolean }[];
       summary: string;
     };
     timeline: TimelineEvent[];

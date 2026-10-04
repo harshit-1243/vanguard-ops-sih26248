@@ -7,9 +7,12 @@ import {
   CreateSessionBodySchema,
   InstructorLoginBodySchema,
   JoinBodySchema,
+  RoleIdSchema,
   SessionCodeSchema,
 } from '@vanguard/shared';
+import { aarFor, decisionsCsv, eventsJson, replayFor, type AarEnricher } from './aar';
 import { RateLimiter } from './auth';
+import { renderAarPdf } from './pdf';
 import type { Config } from './config';
 import { attachGateway } from './gateway';
 import { NotFound, SessionManager } from './manager';
@@ -39,7 +42,7 @@ export function bearer(req: FastifyRequest): string | null {
   return typeof q === 'string' ? q : null;
 }
 
-export async function buildApp(config: Config, store?: EventStore): Promise<AppContext> {
+export async function buildApp(config: Config, store?: EventStore, opts: { enrichAar?: AarEnricher } = {}): Promise<AppContext> {
   const app = Fastify({
     logger: config.LOG_LEVEL === 'silent' ? false : { level: config.LOG_LEVEL },
     bodyLimit: 256 * 1024,
@@ -52,6 +55,7 @@ export async function buildApp(config: Config, store?: EventStore): Promise<AppC
     onError: (err) => app.log.error(err, 'session error'),
   });
   const pinLimiter = new RateLimiter(5, 60_000);
+  const demoLimiter = new RateLimiter(3, 60_000);
 
   app.setErrorHandler((err: Error, _req, reply) => {
     if (err instanceof ZodError) {
@@ -102,6 +106,14 @@ export async function buildApp(config: Config, store?: EventStore): Promise<AppC
     });
   });
 
+  /** One-click finished demo exercise (scripted, synthetic) so the AAR can be shown instantly. */
+  app.post('/api/demo', async (req, reply) => {
+    if (!demoLimiter.allow(req.ip)) return reply.code(429).send({ error: 'Too many demo requests — wait a minute' });
+    const { seedDemo } = await import('./demo');
+    const d = await seedDemo(manager);
+    return reply.code(201).send({ code: d.code, pin: d.pin, instructorToken: d.instructorToken });
+  });
+
   app.post('/api/sessions/:code/instructor', async (req, reply) => {
     if (!pinLimiter.allow(req.ip)) return reply.code(429).send({ error: 'Too many attempts — wait a minute' });
     const s = await sessionOr404((req.params as { code: string }).code);
@@ -146,6 +158,45 @@ export async function buildApp(config: Config, store?: EventStore): Promise<AppC
   });
 
   app.decorate('requireAarAccess', requireAarAccess);
+
+  // ---- AAR & exports (US-AAR-8/9) ----
+  const fileName = (s: LiveSession, ext: string) => `vanguard-aar-${s.scenario.id}-${s.code}.${ext}`;
+  app.get('/api/sessions/:code/aar', async (req, reply) => {
+    const s = await requireAarAccess(req, reply);
+    if (!s) return reply;
+    return aarFor(s, opts.enrichAar);
+  });
+  app.get('/api/sessions/:code/aar.pdf', async (req, reply) => {
+    const s = await requireAarAccess(req, reply);
+    if (!s) return reply;
+    const pdf = await renderAarPdf(await aarFor(s, opts.enrichAar));
+    return reply
+      .header('content-type', 'application/pdf')
+      .header('content-disposition', `attachment; filename="${fileName(s, 'pdf')}"`)
+      .send(pdf);
+  });
+  app.get('/api/sessions/:code/events.json', async (req, reply) => {
+    const s = await requireAarAccess(req, reply);
+    if (!s) return reply;
+    return reply.header('content-disposition', `attachment; filename="${fileName(s, 'events.json')}"`).send(eventsJson(s));
+  });
+  app.get('/api/sessions/:code/decisions.csv', async (req, reply) => {
+    const s = await requireAarAccess(req, reply);
+    if (!s) return reply;
+    return reply
+      .header('content-type', 'text/csv; charset=utf-8')
+      .header('content-disposition', `attachment; filename="${fileName(s, 'decisions.csv')}"`)
+      .send(decisionsCsv(s.sim.state.decisions));
+  });
+  app.get('/api/sessions/:code/replay', async (req, reply) => {
+    const s = await requireAarAccess(req, reply);
+    if (!s) return reply;
+    const q = req.query as { view?: string; stepS?: string };
+    const view = q.view && q.view !== 'truth' ? RoleIdSchema.parse(q.view) : 'truth';
+    if (view !== 'truth' && !s.sim.state.enabledRoles.includes(view)) return reply.code(400).send({ error: 'Role not in exercise' });
+    const stepS = Math.min(120, Math.max(5, Number(q.stepS) || 10));
+    return replayFor(s, view, stepS);
+  });
 
   // ---- static SPA (production) ----
   if (existsSync(config.webDist)) {

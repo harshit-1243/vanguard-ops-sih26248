@@ -11,3 +11,5 @@ export * from './probes';
 export * from './projection';
 export * from './simulation';
 export * from './replay';
+export * from './metrics';
+export * from './aar';
