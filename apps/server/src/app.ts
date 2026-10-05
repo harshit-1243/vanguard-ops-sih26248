@@ -1,4 +1,5 @@
 import { existsSync } from 'node:fs';
+import { monitorEventLoopDelay } from 'node:perf_hooks';
 import Fastify, { type FastifyInstance, type FastifyReply, type FastifyRequest } from 'fastify';
 import fastifyStatic from '@fastify/static';
 import type { Server } from 'socket.io';
@@ -93,11 +94,16 @@ export async function buildApp(
     return null;
   };
 
+  const loopDelay = monitorEventLoopDelay({ resolution: 20 });
+  loopDelay.enable();
   app.get('/healthz', async () => ({
     ok: true,
     store: st.kind,
     sessions: manager.list().length,
+    running: manager.list().filter((x) => x.phase === 'RUNNING').length,
     uptimeS: Math.round(process.uptime()),
+    rssMb: Math.round(process.memoryUsage().rss / 1e6),
+    eventLoopP99Ms: Math.round(loopDelay.percentile(99) / 1e5) / 10,
   }));
 
   app.get('/api/scenarios', async () => scenarios.list());

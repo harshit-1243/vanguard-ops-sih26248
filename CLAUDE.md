@@ -23,6 +23,7 @@ pnpm build             # all packages; server -> apps/server/dist, web -> apps/w
 pnpm start             # serve built web + API on :8080
 pnpm e2e               # Playwright (expects `pnpm build` first; `pnpm e2e:full` builds)
 pnpm --filter @vanguard/server smoke <url>   # live smoke test (health, sessions, sockets, AAR, PDF)
+pnpm --filter @vanguard/server loadtest <url> [sessions] [seconds]  # concurrent-exercise load test
 SCREENSHOTS=1 pnpm e2e e2e/screenshots.spec.ts  # regenerate docs/screenshots
 pnpm seed:demo         # finished demo exercise (persisted with DATABASE_URL, else PDF + log to ./.data)
 docker compose up      # full offline stack (app + postgres [+ ollama profile])
@@ -41,8 +42,8 @@ docker compose up      # full offline stack (app + postgres [+ ollama profile])
    and are re-derived on replay.
 4. **Synthetic data only.** Fictional grid, callsigns, units. No real designations, weapon or
    jamming technical data.
-5. **Offline.** No CDN at runtime; fonts via @fontsource, map is an SVG grid (no tiles).
-6. **AI is optional.** `LLM_PROVIDER=none` must keep every feature working (template fallback).
+5. **Offline.** No CDN at runtime; fonts via @fontsource, MapLibre with an inline blank style + GeoJSON (no tiles/glyphs), SVG fallback.
+6. **AI is optional.** `LLM_PROVIDER=none` must keep every feature working (template fallback). OPFOR is rule-based, never LLM-driven (determinism).
 
 ## Conventions
 - Conventional Commits (`feat:`, `fix:`, `test:`, `docs:`, `chore:`), commit per phase at least.

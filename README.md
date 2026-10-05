@@ -29,7 +29,10 @@ Contemporary conflicts have shown that electronic warfare and cyber disruption d
 | **SAGAT freeze probes** | DS freezes the exercise; screens blank; each role answers auto-generated questions scored against ground truth → per-role SA accuracy and a team **SA-divergence heatmap**. |
 | **Confidence calibration** | Every decision carries a confidence (0–100) → Brier score and over-confidence per role. |
 | **Hindsight-safe AAR** | Decision cards freeze what was knowable (intel, ages, conflicts, outages) and reveal ground truth only on demand. Four AAR questions, swimlane timeline, network graph, replay scrubber, **PDF / JSON / CSV** export. |
-| **Optional AI (Smart Automation)** | `LLM_PROVIDER=none\|ollama\|anthropic` — narrative and coaching drafts, contradictory report pairs. Off by default; every feature works on templates. |
+| **Live map + 3D / VR sand table** | MapLibre map (pan/zoom/tilt, extruded terrain, units gliding between ticks, sector popups) and a Three.js sand table with **Enter VR / Enter AR** on WebXR devices — same role-scoped data. |
+| **Adaptive enemy** | Deterministic OPFOR rules: reserves counter-attack threatened objectives, defenders fall back, artillery shoots-and-scoots when spotted, recce probes. |
+| **Exercise variables** | DS sets EW intensity, sensor reliability, comms quality, OPFOR mode and which scripted injects run. |
+| **AI (Smart Automation)** | **AI inject advisor** for the DS (next friction tied to a training objective, one-click apply), AAR narrative and per-decision coaching, contradictory report drafts. Providers: `none` (default) · **Groq / Cerebras (free tiers)** · xAI · any OpenAI-compatible · Ollama (offline) · Anthropic. Everything works without AI. |
 
 ## PS requirement → feature mapping
 
@@ -51,6 +54,7 @@ Full traceability, acceptance criteria and formulas: [`docs/PRD.md`](docs/PRD.md
 | ![Probe](docs/screenshots/10-sagat-probe.png) SAGAT freeze — picture blanked, answer from memory | ![Decision feed](docs/screenshots/08-ds-decision-feed.png) Live decision feed: knowable vs truth |
 | ![AAR summary](docs/screenshots/11-aar-summary.png) AAR executive summary | ![AAR card](docs/screenshots/14-aar-decision-card.png) Hindsight-safe decision card, truth revealed |
 | ![Timeline](docs/screenshots/12-aar-timeline.png) Swimlane timeline + replay | ![Metrics](docs/screenshots/13-aar-metrics-network.png) Metrics, SA heatmaps, comms network |
+| ![3D DS](docs/screenshots/15-ds-3d-sand-table.png) DS 3D sand table (truth, jammer dome, link arcs) — Enter VR/AR on WebXR devices | ![3D trainee](docs/screenshots/16-trainee-3d-sand-table.png) Trainee 3D view — only their perceived picture |
 
 ## Architecture
 
@@ -78,9 +82,9 @@ flowchart LR
 Event-sourced and deterministic: only input events are persisted; seed + log replays to an identical state hash (tested). Details: [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md), API: [`docs/API.md`](docs/API.md), decisions: [`docs/DECISIONS.md`](docs/DECISIONS.md).
 
 ```
-apps/web        React 18 + Vite + Tailwind 4 + Radix (shadcn-style) + Zustand, SVG tactical map
+apps/web        React 18 + Vite + Tailwind 4 + Radix (shadcn-style) + Zustand, MapLibre GL map (SVG fallback), Three.js 3D / WebXR
 apps/server     Node 20 + Fastify 5 + Socket.IO 4 + Zod + Prisma 6 (Postgres) + pdfkit
-packages/sim    pure deterministic simulation + degradation engine (99 % line coverage)
+packages/sim    pure deterministic simulation, degradation engine, adaptive OPFOR (≈99 % line coverage)
 packages/shared Zod schemas, events, commands, DTOs
 scenarios/      Iron Bridge (joint, riverine) · Ridge Line (mountain) — JSON, validated at start-up
 e2e/            Playwright: DS + 3 trainees, accessibility (axe)
@@ -122,9 +126,17 @@ App + PostgreSQL on http://localhost:8080; a finished demo exercise is seeded on
 docker compose exec app node server/dist/seed-demo.js
 ```
 
+### Enabling AI (free)
+
+1. Create a free API key at https://console.groq.com (or https://cloud.cerebras.ai).
+2. Set `LLM_PROVIDER=groq` and `GROQ_API_KEY` (or `cerebras` + `CEREBRAS_API_KEY`) — locally in `.env`, on Render under **Environment**.
+3. Restart / redeploy. The DS header shows **AI · groq**; without a key everything falls back to templates.
+
 ### Configuration
 
-See [`.env.example`](.env.example): `PORT`, `TICK_HZ`, `DATABASE_URL`, `SEED_DEMO_ON_EMPTY`, `LLM_PROVIDER` (`none`|`ollama`|`anthropic`), `OLLAMA_URL`, `OLLAMA_MODEL`, `ANTHROPIC_API_KEY`, `ANTHROPIC_MODEL` (default `claude-opus-5-5`).
+See [`.env.example`](.env.example): `PORT`, `TICK_HZ`, `DATABASE_URL`, `SEED_DEMO_ON_EMPTY`, `LLM_PROVIDER` (`none`|`groq`|`cerebras`|`xai`|`openai`|`ollama`|`anthropic`), `GROQ_API_KEY`, `CEREBRAS_API_KEY`, `XAI_API_KEY`, `LLM_MODEL` / `LLM_BASE_URL` / `LLM_API_KEY` overrides, `OLLAMA_URL`, `OLLAMA_MODEL`, `ANTHROPIC_API_KEY`, `ANTHROPIC_MODEL`.
+
+**Scale (measured):** one Node process ran 40 concurrent exercises (210 sockets) at ×4 — sim clock 96 % of real time, 170 MB RAM, event-loop p99 42 ms (`pnpm --filter @vanguard/server loadtest <url> <sessions> <seconds>`).
 
 ## Deploy
 

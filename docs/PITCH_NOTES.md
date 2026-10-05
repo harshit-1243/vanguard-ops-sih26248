@@ -18,6 +18,8 @@
 - Hindsight-safe decision cards + confidence calibration + SA divergence in one debrief.
 - Event-sourced and deterministic: seed + log replays to an identical state (replay scrubber, audit trail).
 - Tri-service by design: CDR, platoon commanders, Air Liaison/ISR, EW/Signals, optional Naval Liaison.
+- Web **and** VR/AR: 3D sand table with WebXR on the same per-role data; MapLibre map with 3D tilt.
+- Adaptive yet explainable enemy (deterministic rules) and an **AI inject advisor** for the DS; runs on free-tier LLMs (Groq/Cerebras) or fully offline.
 
 ## Tech stack
 - TypeScript monorepo: React 18 + Vite + Tailwind + Radix; Node 20 + Fastify + Socket.IO + Zod; Prisma + PostgreSQL; pdfkit.
@@ -33,7 +35,7 @@
 ## Impact
 - Rehearse decision-making under uncertainty for every course (≈ 500 officers) with measurable outcomes: decision latency after friction, verification behaviour, calibration, intent adherence, SA accuracy and divergence.
 - Objective, exportable AARs for DS and trainees; trend tracking across courses.
-- Path forward: WebXR "3D sand-model" view on the same data feed, voice push-to-talk over degraded nets, AI-adaptive OPFOR.
+- Path forward: voice push-to-talk over degraded nets, scenario editor UI, cross-course analytics.
 
 ## References (public context only)
 - PS SIH26248 statement (MoD / DSSC Wellington).

@@ -78,6 +78,15 @@
 ## Phase 12 — Handover docs ✅ (2026-10-05)
 - README (pitch, PS mapping, 10 screenshots captured by Playwright into docs/screenshots, Mermaid architecture, quick start, Docker, Render deploy steps, Why, safety, team placeholders), docs/DEMO_SCRIPT.md (3-min timed demo + Q&A), docs/PITCH_NOTES.md.
 
+## Phase 13 — Post-test improvements ✅ (2026-10-05)
+- MapLibre GL map (D-016): 3D tilt, tweened movement, sector popups, hover, keyboard sectors; SVG fallback. Fixed: MapLibre rejects data-driven `line-dasharray` (link layer split).
+- 3D sand table (Three.js, lazy-loaded) with WebXR **Enter VR / Enter AR** (buttons appear only on devices with immersive-session support; rendering verified in headless Chromium/SwiftShader, headset not available here).
+- Adaptive OPFOR (D-017), exercise variables on Create (D-020), clock checkpoints every 30 s (D-019).
+- AI: Groq / Cerebras / xAI / OpenAI-compatible providers (D-018), AI inject advisor + AI status chip; AAR AI drafts only after END.
+- Load test: 40 concurrent exercises (210 sockets) at ×4 → 96 % real-time, 170 MB RSS, loop p99 42 ms. `/healthz` now reports memory and event-loop delay.
+- Tests: OPFOR rules, settings, checkpoint replay (sim); providers, advisor, restart resume (server). E2E clicks real map points (MapLibre via SwiftShader).
+- Awaiting user: a free Groq or Cerebras key in Render to verify the AI layer live.
+
 ## Pending
 - Nothing blocking. Optional: set repo topics/description in the GitHub UI; fill in team names in the README.
 

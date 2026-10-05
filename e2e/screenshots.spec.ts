@@ -74,6 +74,14 @@ test('capture README screenshots', async ({ browser, request }) => {
   await expect(ds.getByText('Showing exactly what PL_B sees right now')).toBeVisible();
   await shot(ds, '09-ds-view-as-pl-b');
   await ds.getByRole('button', { name: 'Ground truth' }).click();
+  await ds.getByRole('button', { name: '3D · VR' }).click();
+  await expect(ds.getByTestId('sand-table')).toBeVisible();
+  await ds.waitForTimeout(1500);
+  await shot(ds, '15-ds-3d-sand-table');
+  await ds.getByRole('button', { name: 'Map', exact: true }).click();
+  await cdr.getByRole('button', { name: '3D · VR' }).click();
+  await cdr.waitForTimeout(1500);
+  await shot(cdr, '16-trainee-3d-sand-table');
 
   await ds.getByRole('button', { name: 'Resume' }).click();
   await ds.getByRole('button', { name: 'Freeze & probe' }).click();

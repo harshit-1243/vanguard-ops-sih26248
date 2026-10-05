@@ -434,3 +434,27 @@ Client → server: `cmd` (Zod discriminated union, ack `{ok, error?}`): DS — `
 - AI-adaptive OPFOR (hostile units react to trainee decisions).
 - Scenario editor UI (v1: JSON files + validation).
 - Multi-sub-unit (battalion) exercises with >6 roles; SSO/LDAP auth.
+
+
+---
+
+## Addendum v1.1 (2026-10-05) — after first user test
+
+Changes requested after hands-on testing of the deployed build; each is logged in `DECISIONS.md`.
+
+**A1. Map (D-016).** The tactical map is MapLibre GL (offline GeoJSON on a blank style, HTML markers, no tiles/glyphs) with pan/zoom/rotate, a 3D tilt that extrudes ridges/hills/urban blocks, unit movement tweened between ticks, hover highlight and a **sector popup** on click (terrain, units/contacts in the sector, what this role has heard about it). The SVG map remains as an automatic fallback without WebGL.
+*AC:* G a trainee clicks any sector, T a popup lists that sector's contents and the decision target is set; G units move, T they glide between ticks instead of jumping.
+
+**A2. 3D sand table + WebXR (was §18 future).** A "3D · VR" toggle renders the same role-scoped data as a Three.js sand table (terrain blocks by elevation, unit tokens, jammer domes, link arcs, objective flags; click a token for details). On WebXR devices **Enter VR** places the table in front of the user and **Enter AR** places it in the room. Trainees still see only their perceived picture.
+
+**A3. Adaptive OPFOR §8.1 (D-017).** With session setting `opfor=adaptive` (default), hostile units with a behaviour react every 30 s by deterministic rules: `reserve` counter-attacks the objective BLUE threatens (resolved on arrival with a force-ratio table), `defend` falls back from ≥1.5× BLUE strength, `shoot-and-scoot` relocates after being spotted/struck (180 s cooldown), `probe` shadows the nearest BLUE unit. Reactions are journaled (`OPFOR`) and shown in the AAR timeline.
+
+**A4. Exercise variables (D-020, PS outcome 3).** At creation the DS sets EW intensity (jammer radius ×0.75/×1/×1.3), sensor reliability, comms quality, OPFOR mode and which MSEL items are active. Stored in `SESSION_CREATED.settings`; replay-safe.
+
+**A5. AI layer (D-018).** Providers: `none` (default, templates) · `groq` · `cerebras` · `xai` (OpenAI-compatible, free tiers) · `openai` (any compatible endpoint) · `ollama` (offline) · `anthropic`. New **AI inject advisor** (US-DS-10): G a running exercise, W the DS clicks *Suggest next inject*, T up to 3 suggestions appear, each tied to a training objective (mission command, verification, PACE, SA, navigation, digital resilience, report age) with a reason derived from live state and one-click *Apply*; with a provider configured an "AI-generated draft" DS briefing is added. AAR narrative/coaching drafts run only for ended exercises.
+
+**A6. Restart safety (D-019).** A `CLOCK_CHECKPOINT` input event every 30 sim-seconds bounds sim time lost on a server restart to ≤ 30 s.
+
+**A7. Scale (measured).** One Node process ran 40 concurrent exercises (210 connected sockets) at ×4 for 45 s: sim clock at 96 % of real time, RSS 170 MB, event-loop p99 42 ms (`pnpm --filter @vanguard/server loadtest`). A full DSSC course (~70 syndicates) at ×1 fits on one server; no horizontal scaling planned.
+
+**Assessed, not in scope:** voice push-to-talk (high effort and risk, low marginal value over degraded text nets); full scenario editor and cross-course analytics (JSON scenarios + exercise variables cover SIH needs).

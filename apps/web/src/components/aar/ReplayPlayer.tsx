@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { Pause, Play } from 'lucide-react';
 import { formatAge, formatT, type ReplayResponse, type RoleId } from '@vanguard/shared';
 import { type MapMarker } from '@/components/map/TacticalMap';
-import { MapView } from '@/components/map/MapView';
+import { MapPanel } from '@/components/map/MapPanel';
 import { glyph } from '@/components/map/adapters';
 import { Badge, Button } from '@/components/ui/primitives';
 import { api } from '@/lib/api';
@@ -70,7 +70,7 @@ export function ReplayPlayer({ code, token, roles, features, objectives }: { cod
     <div className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_280px]">
       <div className="aspect-square max-h-[560px] w-full rounded-lg border border-line bg-bg p-2">
         {data && f ? (
-          <MapView animMs={playing ? Math.round(900 / speed) : 300} terrain={data.terrain} features={features} objectives={objectives} markers={markers} jammers={jammers} ariaLabel={`Replay map at ${formatT(f.tMs)}, ${view === 'truth' ? 'ground truth' : `${view}'s perceived picture`}`} />
+          <MapPanel title={view === 'truth' ? 'replay — ground truth' : `replay — ${view}`} animMs={playing ? Math.round(900 / speed) : 300} terrain={data.terrain} features={features} objectives={objectives} markers={markers} jammers={jammers} ariaLabel={`Replay map at ${formatT(f.tMs)}, ${view === 'truth' ? 'ground truth' : `${view}'s perceived picture`}`} />
         ) : (
           <p className="p-6 text-sm text-muted" role="status">{error ?? 'Rebuilding state from the event log…'}</p>
         )}

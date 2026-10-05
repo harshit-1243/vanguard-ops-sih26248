@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react';
 import { FileText, Gavel, Radio, ScrollText } from 'lucide-react';
 import type { PerceivedPicture } from '@vanguard/shared';
 import { MapLegend } from '@/components/map/TacticalMap';
-import { MapView } from '@/components/map/MapView';
+import { MapPanel } from '@/components/map/MapPanel';
 import { formatAge } from '@vanguard/shared';
 import { perceivedLayers } from '@/components/map/adapters';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/radix';
@@ -35,7 +35,8 @@ export function RoleWorkspace({ p, cmd, readOnly }: { p: PerceivedPicture; cmd: 
             {!readOnly && <span className="font-mono text-muted">target: <span className="text-accent">{targetCell ?? '—'}</span></span>}
           </div>
           <div className="min-h-0 flex-1">
-            <MapView
+            <MapPanel
+              title={`${p.callsign} perceived picture`}
               animMs={Math.round(900 / p.speed)}
               describeCell={(cell) =>
                 p.intel

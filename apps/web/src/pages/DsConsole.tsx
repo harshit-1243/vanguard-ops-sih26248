@@ -5,7 +5,7 @@ import { formatT, type Band, type InstructorState, type RoleId } from '@vanguard
 import { Brand, Toast } from '@/components/shell';
 import { ConnDot } from '@/components/status';
 import { MapLegend } from '@/components/map/TacticalMap';
-import { MapView } from '@/components/map/MapView';
+import { MapPanel } from '@/components/map/MapPanel';
 import { truthLayers } from '@/components/map/adapters';
 import { ActiveEffects, CyberControls, InjectComposer } from '@/components/ds/InjectComposer';
 import { AiAdvisor, AiChip } from '@/components/ds/AiAdvisor';
@@ -203,7 +203,8 @@ export default function DsConsole() {
         {view === 'truth' ? (
           <section className="flex min-h-[420px] flex-col border-r border-line p-3" aria-label="Ground-truth map">
             <div className="min-h-0 flex-1">
-              <MapView
+              <MapPanel
+                title="ground truth"
                 animMs={Math.round(900 / truth.speed)}
                 describeCell={(cell) => truth.links.filter((l) => l.level !== 'CLEAR' && truth.roles.find((r) => r.role === l.a)?.trueCell === cell).map((l) => `${l.a}→${l.b} ${l.channel}: ${l.level}${l.causes.length ? ` (${l.causes.join(', ')})` : ''}`)}
                 terrain={truth.terrain}
