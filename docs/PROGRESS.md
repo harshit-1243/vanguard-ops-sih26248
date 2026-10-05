@@ -94,6 +94,10 @@
 - Fixed: Iron Bridge armour started on sea (found by the new validator). Config now trims env values and ignores blanks; `/api/ai/status` reports `requested`/`ready` to diagnose deploy config.
 - Tests: +12 server (CRUD, auth, validation, dry run, analytics, CSV, restart), +2 E2E incl. axe on the new pages.
 
+## Phase 15 — Landing page redesign ✅ (2026-10-05)
+- Claude Design concept ported to React: truth/fog sand-model hero with draggable + keyboard divider, mobile tabs, six animated friction diagrams, AAR reveal card, product screenshots, closed-network section.
+- Self-hosted Archivo; images as WebP (hero 181/248 KB); reduced-motion respected; axe clean; new `e2e/landing.spec.ts`.
+
 ## Pending
 - Nothing blocking. Optional: set repo topics/description in the GitHub UI; fill in team names in the README.
 

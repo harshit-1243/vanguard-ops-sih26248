@@ -102,3 +102,10 @@ ENDED exercise once, reduce it to the AAR metrics and cache the result (ended lo
 so every number traces back to an AAR. Exercises carry a free-text course/syndicate label.
 The course-director area (editor + analytics) needs `ADMIN_KEY` as a bearer token; without it the
 area is open (closed LAN only) and the UI says so. The Render Blueprint generates the key.
+
+**D-023 · 2026-10-05 · Landing page redesign ("Fog, by design").** Designed in Claude Design from
+`docs/design/claude-design-prompt.md`, then ported to a React page (not the exported bundle, which
+loads React and fonts from CDNs). The hero stacks a clear and a fogged render of the same sand model;
+a keyboard-operable divider reveals ground truth vs one commander's picture (tabs on mobile).
+Archivo (variable, self-hosted via @fontsource) joins IBM Plex for display type. Hero images are
+AI-generated illustrations of a fictional sand model (no real insignia or places).

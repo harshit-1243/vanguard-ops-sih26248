@@ -4,6 +4,7 @@
 @import '@fontsource/ibm-plex-sans/600.css';
 @import '@fontsource/ibm-plex-mono/400.css';
 @import '@fontsource/ibm-plex-mono/500.css';
+@import '@fontsource-variable/archivo/standard.css';
 
 /* Ops-room palette: restrained slate, one amber accent (DS actions), force colours always
    paired with shape/text so colour is never the only signal. */
@@ -111,3 +112,21 @@ body {
 .maplibregl-ctrl-group button { filter: invert(0.85); }
 .vg-crowded .vg-label { max-width: 54px; overflow: hidden; text-overflow: ellipsis; font-size: 9px; }
 .vg-crowded .vg-sub { display: none; }
+
+/* ---------------- Landing page (Claude Design port) ---------------- */
+.lp { --lp-ink: #0b0f13; --lp-paper: #eee7d6; --lp-text: #ece6d8; --lp-head: #f2ecdf; --lp-sub: #c9c3b4; --lp-mut: #b5afa0; --lp-line: #2a333b; --lp-amber: #e5a940; background: var(--lp-ink); color: var(--lp-text); overflow-x: hidden; min-height: 100vh; font-family: 'IBM Plex Sans', sans-serif; }
+.lp a { color: var(--lp-amber); text-underline-offset: 3px; }
+.lp a:hover { color: #f3c978; }
+.lp *:focus-visible { outline: 2px solid var(--lp-amber); outline-offset: 3px; }
+.lp input::placeholder { color: #7f7b70; letter-spacing: .3em; }
+.lp .lp-display { font-family: 'Archivo Variable', 'Archivo', sans-serif; }
+.lp .lp-btn { display: inline-flex; align-items: center; justify-content: center; gap: 10px; border-radius: 3px; text-decoration: none; cursor: pointer; font: 600 15px/1 'IBM Plex Sans', sans-serif; }
+.lp .lp-btn-primary { background: var(--lp-amber); color: var(--lp-ink); border: 0; }
+.lp .lp-btn-primary:hover { background: #f0bb5a; color: var(--lp-ink); }
+.lp .lp-btn-dark { background: #1c242b; color: var(--lp-text); border: 1px solid #3a444d; }
+.lp .lp-btn-dark:hover { background: #25303a; color: var(--lp-text); }
+.lp .lp-nav-link { position: relative; padding: 10px clamp(7px, .8vw, 12px); font: 500 13.5px/1 'IBM Plex Sans', sans-serif; color: var(--lp-sub); text-decoration: none; white-space: nowrap; border-bottom: 2px solid transparent; }
+.lp .lp-nav-link:hover { color: var(--lp-text); }
+.lp .lp-nav-link[aria-current='true'] { color: var(--lp-amber); border-bottom-color: var(--lp-amber); }
+@keyframes lpFogDrift { 0% { transform: translate3d(0,0,0) } 50% { transform: translate3d(-3%,1.5%,0) } 100% { transform: translate3d(0,0,0) } }
+@media (prefers-reduced-motion: reduce) { .lp * { animation: none !important; } html { scroll-behavior: auto !important; } }
