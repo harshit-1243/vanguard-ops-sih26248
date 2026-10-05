@@ -1,7 +1,7 @@
 import { useEffect, useState, type FormEvent } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import type { LobbyInfo, RoleId } from '@vanguard/shared';
-import { PageShell } from '@/components/shell';
+import { PageHeader, PageShell } from '@/components/shell';
 import { Badge, Button, Input, Label, Panel } from '@/components/ui/primitives';
 import { api } from '@/lib/api';
 import { saveIdentity } from '@/lib/identity';
@@ -56,9 +56,9 @@ export default function Join() {
 
   return (
     <PageShell>
+      <PageHeader kicker="TRAINEE · REPORT IN" title="Join exercise." sub="Enter the code from your Directing Staff, pick a free role and your callsign. You will see only what reaches you." />
       <Panel className="mx-auto max-w-xl p-6">
-        <h1 className="text-lg font-semibold">Join exercise</h1>
-        <form className="mt-5 grid gap-5" onSubmit={submit}>
+        <form className="grid gap-5" onSubmit={submit}>
           <div>
             <Label htmlFor="code">Session code</Label>
             <Input
@@ -67,7 +67,7 @@ export default function Join() {
               autoComplete="off"
               maxLength={6}
               placeholder="e.g. K7Q2MX"
-              className="h-12 font-mono text-xl uppercase tracking-[0.3em]"
+              className="h-14 border-accent/40 font-mono text-2xl uppercase tracking-[0.32em]"
               value={code}
               onChange={(e) => setCode(e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, ''))}
             />
@@ -76,11 +76,11 @@ export default function Join() {
           {lobby && (
             <>
               <div className="rounded-md border border-line bg-panel2 p-3">
-                <p className="text-sm font-semibold">{lobby.title}</p>
+                <p className="font-display text-lg font-bold text-head">{lobby.title}</p>
                 <p className="text-xs text-muted">{lobby.theatre} · {lobby.phase === 'LOBBY' ? 'waiting to start' : lobby.phase.toLowerCase()}</p>
               </div>
               <fieldset>
-                <legend className="mb-2 text-[11px] font-medium uppercase tracking-wider text-muted">Role</legend>
+                <legend className="mb-2 font-mono text-[11.5px] font-medium tracking-[0.16em] text-accent">ROLE</legend>
                 <div className="grid gap-2" role="radiogroup">
                   {lobby.roles.map((r) => (
                     <label

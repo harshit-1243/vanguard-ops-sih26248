@@ -71,10 +71,10 @@ function symbolSvg(m: MapMarker): string {
   } else {
     shape = `<circle cx="20" cy="15" r="12" fill="#3a3418" stroke="${color}" stroke-width="1.8"/>`;
   }
-  const glyph = m.negative ? '' : `<text x="20" y="18.5" text-anchor="middle" font-size="${m.glyph.length > 3 ? 8 : 9}" font-family="IBM Plex Mono, monospace" font-weight="500" fill="#dce3ea">${esc(m.glyph)}</text>`;
+  const glyph = m.negative ? '' : `<text x="20" y="18.5" text-anchor="middle" font-size="${m.glyph.length > 3 ? 8 : 9}" font-family="IBM Plex Mono, monospace" font-weight="500" fill="#ece6d8">${esc(m.glyph)}</text>`;
   const ring = m.conflict ? `<rect x="-2" y="-1" width="44" height="32" rx="5" fill="none" stroke="#e0a83c" stroke-width="2" stroke-dasharray="5 3"/>` : '';
   const own = m.own ? `<rect x="0" y="1" width="40" height="28" rx="3" fill="none" stroke="${color}" stroke-width="1.4"/>` : '';
-  const cross = m.destroyed ? `<line x1="8" y1="3" x2="32" y2="27" stroke="#dce3ea" stroke-width="2"/><line x1="32" y1="3" x2="8" y2="27" stroke="#dce3ea" stroke-width="2"/>` : '';
+  const cross = m.destroyed ? `<line x1="8" y1="3" x2="32" y2="27" stroke="#ece6d8" stroke-width="2"/><line x1="32" y1="3" x2="8" y2="27" stroke="#ece6d8" stroke-width="2"/>` : '';
   const bang = m.conflict ? `<circle cx="41" cy="2" r="6.5" fill="#e0a83c"/><text x="41" y="5.5" text-anchor="middle" font-size="10" font-weight="700" fill="#1a1306">!</text>` : '';
   return `<svg width="48" height="34" viewBox="-4 -5 50 37" aria-hidden="true">${ring}${own}${shape}${glyph}${cross}${bang}</svg>`;
 }
@@ -155,7 +155,7 @@ function GlMap(props: MapViewProps) {
     if (!box.current) return;
     const map = new maplibregl.Map({
       container: box.current,
-      style: { version: 8, sources: {}, layers: [{ id: 'bg', type: 'background', paint: { 'background-color': '#0d1217' } }] },
+      style: { version: 8, sources: {}, layers: [{ id: 'bg', type: 'background', paint: { 'background-color': '#0b0f13' } }] },
       bounds,
       fitBoundsOptions: { padding: 24 },
       maxBounds: new maplibregl.LngLatBounds(toLngLat(-4, 12), toLngLat(12, -4)),
@@ -184,7 +184,7 @@ function GlMap(props: MapViewProps) {
         grid.push({ type: 'Feature', properties: {}, geometry: { type: 'LineString', coordinates: [toLngLat(0, i), toLngLat(8, i)] } });
       }
       map.addSource('grid', { type: 'geojson', data: featureCollection(grid) });
-      map.addLayer({ id: 'grid', type: 'line', source: 'grid', paint: { 'line-color': '#dce3ea', 'line-opacity': 0.12, 'line-width': 1 } });
+      map.addLayer({ id: 'grid', type: 'line', source: 'grid', paint: { 'line-color': '#ece6d8', 'line-opacity': 0.12, 'line-width': 1 } });
       for (const id of ['objectives', 'jammers', 'jam-inner', 'links', 'moves', 'select', 'hover', 'relays']) {
         map.addSource(id, { type: 'geojson', data: featureCollection([]) });
       }
@@ -194,9 +194,9 @@ function GlMap(props: MapViewProps) {
       // dasharray can't be data-driven: one solid layer for CLEAR, one dashed for DEGRADED/DENIED
       map.addLayer({ id: 'links', type: 'line', source: 'links', filter: ['==', ['get', 'level'], 'CLEAR'], paint: { 'line-color': ['get', 'color'], 'line-width': 1.4, 'line-opacity': 0.85 } });
       map.addLayer({ id: 'links-bad', type: 'line', source: 'links', filter: ['!=', ['get', 'level'], 'CLEAR'], paint: { 'line-color': ['get', 'color'], 'line-width': 2.4, 'line-opacity': 0.9, 'line-dasharray': [2, 2] } });
-      map.addLayer({ id: 'moves', type: 'line', source: 'moves', paint: { 'line-color': '#93a1af', 'line-width': 1.4, 'line-dasharray': [2, 2] } });
+      map.addLayer({ id: 'moves', type: 'line', source: 'moves', paint: { 'line-color': '#b5afa0', 'line-width': 1.4, 'line-dasharray': [2, 2] } });
       map.addLayer({ id: 'relays', type: 'circle', source: 'relays', paint: { 'circle-radius': 6, 'circle-color': 'transparent', 'circle-stroke-color': '#52b984', 'circle-stroke-width': 2, 'circle-stroke-opacity': ['case', ['get', 'active'], 1, 0.4] } });
-      map.addLayer({ id: 'hover', type: 'line', source: 'hover', paint: { 'line-color': '#dce3ea', 'line-width': 1.5, 'line-opacity': 0.55 } });
+      map.addLayer({ id: 'hover', type: 'line', source: 'hover', paint: { 'line-color': '#ece6d8', 'line-width': 1.5, 'line-opacity': 0.55 } });
       map.addLayer({ id: 'select', type: 'line', source: 'select', paint: { 'line-color': '#e5a940', 'line-width': 3.5 } });
       // edge labels A–H / 1–8 as lightweight HTML markers (no glyph server needed)
       for (let i = 0; i < 8; i++) {

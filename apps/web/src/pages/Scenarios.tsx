@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Copy, Download, Pencil, Trash2, Upload } from 'lucide-react';
 import type { Scenario, ScenarioListItem } from '@vanguard/shared';
 import { AdminGate, AdminNav, OpenModeNote } from '@/components/admin/AdminGate';
-import { PageShell } from '@/components/shell';
+import { PageHeader, PageShell } from '@/components/shell';
 import { Badge, Button, Panel } from '@/components/ui/primitives';
 import { adminApi, saveBlob } from '@/lib/admin';
 
@@ -29,14 +29,11 @@ function Library({ open }: { open: boolean }) {
   return (
     <PageShell wide right={<AdminNav open={open} />}>
       <OpenModeNote open={open} />
-      <div className="flex flex-wrap items-end justify-between gap-3">
-        <div>
-          <h1 className="text-xl font-semibold">Scenario library</h1>
-          <p className="mt-1 max-w-2xl text-sm text-muted">
-            Built-in templates are read-only — duplicate one to make your own. Custom scenarios are validated and dry-run before saving, and each
-            exercise keeps a snapshot, so editing a scenario never changes a past AAR.
-          </p>
-        </div>
+      <PageHeader
+        kicker="COURSE DIRECTOR · 1. PLANNING"
+        title="Scenario library."
+        sub="Built-in templates are read-only — duplicate one to make your own. Custom scenarios are validated and dry-run before saving, and each exercise keeps a snapshot, so editing a scenario never changes a past AAR."
+        right={
         <div className="flex gap-2">
           <input
             ref={fileRef}
@@ -58,7 +55,8 @@ function Library({ open }: { open: boolean }) {
           />
           <Button variant="outline" onClick={() => fileRef.current?.click()}><Upload size={14} aria-hidden /> Import JSON</Button>
         </div>
-      </div>
+        }
+      />
       {err && <p role="alert" className="mt-4 text-sm text-bad">{err}</p>}
       {!list ? (
         <p className="mt-6 text-sm text-muted">Loading…</p>
@@ -69,7 +67,7 @@ function Library({ open }: { open: boolean }) {
               <Panel className="flex h-full flex-col p-4">
                 <div className="flex items-start justify-between gap-2">
                   <div>
-                    <h2 className="font-semibold">{s.title}</h2>
+                    <h2 className="font-display text-lg font-bold text-head">{s.title}</h2>
                     <p className="font-mono text-[11px] text-faint">{s.id}</p>
                   </div>
                   <div className="flex gap-1">

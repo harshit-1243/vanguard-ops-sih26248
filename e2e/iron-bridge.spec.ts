@@ -57,12 +57,16 @@ test('Iron Bridge: DS + 3 trainees, jammer cut-off, decision, probe, AAR PDF', a
   // ---- CDR transmits to PL A over the command net (real cross-context traffic)
   await cdr.getByRole('tab', { name: /Comms/ }).click();
   await cdr.getByRole('checkbox', { name: 'KESTREL 1' }).check();
-  await cdr.getByLabel('Message text').fill('KESTREL 1, advance to C4 and report.');
-  await cdr.getByRole('button', { name: 'Send message' }).click();
   await plA.getByRole('tab', { name: /Comms/ }).click();
-  // It may arrive partly garbled (corruption is part of the pipeline) — check the RX from KESTREL 6.
+  // Nets drop traffic by design (seeded, but the send instant varies run to run), so — like an
+  // operator — repeat the transmission until it is acknowledged. It may also arrive garbled.
   const plALog = plA.getByRole('list', { name: 'Message log' });
-  await expect(plALog.getByText('KESTREL 6')).toBeVisible({ timeout: 30_000 });
+  await expect(async () => {
+    if (await plALog.getByText('KESTREL 6').count()) return;
+    await cdr.getByLabel('Message text').fill('KESTREL 1, advance to C4 and report.');
+    await cdr.getByRole('button', { name: 'Send message' }).click();
+    await expect(plALog.getByText('KESTREL 6')).toBeVisible({ timeout: 12_000 });
+  }).toPass({ timeout: 60_000 });
   await expect(plALog.getByText(/advance|~~~/).first()).toBeVisible();
 
   // ---- DS places a jammer over PL B (G2, VHF+HF) using the map tool

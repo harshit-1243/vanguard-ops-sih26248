@@ -98,6 +98,10 @@
 - Claude Design concept ported to React: truth/fog sand-model hero with draggable + keyboard divider, mobile tabs, six animated friction diagrams, AAR reveal card, product screenshots, closed-network section.
 - Self-hosted Archivo; images as WebP (hero 181/248 KB); reduced-motion respected; axe clean; new `e2e/landing.spec.ts`.
 
+## Phase 16 — App restyle + Team K18 ✅ (2026-10-05)
+- Inner app matches the landing page: warm ink palette tokens, near-square corners, Archivo titles, exercise strip, A–H ruler page headers with orders-style kickers, new emblem/wordmark, K18 footer; AAR sections restyled; map/3D label colours aligned.
+- Iron Bridge E2E repeats the CMD_NET transmission until received (nets drop traffic by design).
+
 ## Pending
 - Nothing blocking. Optional: set repo topics/description in the GitHub UI; fill in team names in the README.
 

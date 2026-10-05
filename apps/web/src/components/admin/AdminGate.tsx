@@ -74,7 +74,8 @@ export function AdminGate({ children, wide = true }: { children: (open: boolean)
     return (
       <PageShell right={<AdminNav open />}>
         <Panel className="mx-auto max-w-md p-6">
-          <h1 className="flex items-center gap-2 text-lg font-semibold"><KeyRound size={18} className="text-accent" aria-hidden /> Course director</h1>
+          <p className="font-mono text-[11.5px] font-medium tracking-[0.16em] text-accent">COURSE DIRECTOR</p>
+          <h1 className="mt-2 flex items-center gap-2 text-3xl font-bold text-head"><KeyRound size={22} className="text-accent" aria-hidden /> Unlock.</h1>
           <p className="mt-1 text-sm text-muted">The scenario editor and cross-course analytics need the course-director key (<code className="font-mono">ADMIN_KEY</code> on the server).</p>
           <form
             className="mt-5 grid gap-3"

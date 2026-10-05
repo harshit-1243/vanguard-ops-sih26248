@@ -1,7 +1,7 @@
 # VANGUARD OPS
 
 **Multi-domain decision-making trainer for degraded communication environments**
-Smart India Hackathon 2026 · PS **SIH26248** · Ministry of Defence — DSSC Wellington · Software · Smart Automation
+Smart India Hackathon 2026 · PS **SIH26248** · Ministry of Defence — DSSC Wellington · Software · Smart Automation · **Team K18**
 
 [![CI](https://github.com/harshit-1243/vanguard-ops-sih26248/actions/workflows/ci.yml/badge.svg)](https://github.com/harshit-1243/vanguard-ops-sih26248/actions/workflows/ci.yml)
 
@@ -167,11 +167,6 @@ Free-tier notes: the web service sleeps after ~15 min idle (first request wakes 
 
 ## Team
 
-| Name | Role |
-|---|---|
-| _TBD_ | Team lead |
-| _TBD_ | Simulation & backend |
-| _TBD_ | Frontend & UX |
-| _TBD_ | Domain / DS liaison |
+**Team K18** — Smart India Hackathon 2026, problem statement SIH26248.
 
 Demo script: [`docs/DEMO_SCRIPT.md`](docs/DEMO_SCRIPT.md) · Pitch notes: [`docs/PITCH_NOTES.md`](docs/PITCH_NOTES.md) · Status: [`docs/PROGRESS.md`](docs/PROGRESS.md)

@@ -44,7 +44,7 @@ export function Swimlanes({ aar, onPick }: { aar: AarReport; onPick?: (ref: stri
             case 'DECISION': {
               const x = X(e.tMs);
               const cy = y + laneH / 2 + 2;
-              return <path key={idx} {...common} d={`M${x} ${cy - 7} L${x + 6} ${cy} L${x} ${cy + 7} L${x - 6} ${cy} Z`} fill={SOUND[e.soundness ?? 'RISKY']} stroke="#0d1217"><title>{`${formatT(e.tMs)} ${e.lane}: ${e.label} — ${e.soundness}`}</title></path>;
+              return <path key={idx} {...common} d={`M${x} ${cy - 7} L${x + 6} ${cy} L${x} ${cy + 7} L${x - 6} ${cy} Z`} fill={SOUND[e.soundness ?? 'RISKY']} stroke="#0b0f13"><title>{`${formatT(e.tMs)} ${e.lane}: ${e.label} — ${e.soundness}`}</title></path>;
             }
             case 'MSG_SENT':
             case 'MSG_RECV':
@@ -111,7 +111,7 @@ export function NetworkGraph({ aar }: { aar: AarReport }) {
               <line x1={a.x} y1={a.y} x2={b.x} y2={b.y} stroke={color} strokeWidth={1 + (4 * e.sent) / maxSent} strokeDasharray={loss > 0.3 ? '5 3' : undefined} markerEnd="url(#nx-arrow)" opacity={0.85}>
                 <title>{`${callsign(e.from)} → ${callsign(e.to)}: ${e.delivered}/${e.sent} delivered, ${e.dropped} lost`}</title>
               </line>
-              <text x={mx} y={my} fontSize={10} fontFamily="var(--font-mono)" textAnchor="middle" fill="var(--color-ink)" paintOrder="stroke" stroke="#0d1217" strokeWidth={3}>{e.delivered}/{e.sent}</text>
+              <text x={mx} y={my} fontSize={10} fontFamily="var(--font-mono)" textAnchor="middle" fill="var(--color-ink)" paintOrder="stroke" stroke="#0b0f13" strokeWidth={3}>{e.delivered}/{e.sent}</text>
             </g>
           );
         })}

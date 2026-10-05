@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { Download, FileJson, FileSpreadsheet, FileText, Sparkles } from 'lucide-react';
 import { formatT, type AarReport, type RoleId } from '@vanguard/shared';
-import { Brand } from '@/components/shell';
+import { Brand, ExerciseStrip, Ruler } from '@/components/shell';
 import { BarList, MetricCell, NetworkGraph, Swimlanes } from '@/components/aar/Charts';
 import { DecisionCard } from '@/components/aar/DecisionCard';
 import { ReplayPlayer } from '@/components/aar/ReplayPlayer';
@@ -16,8 +16,9 @@ import { cn, num, pct } from '@/lib/utils';
 function Section({ id, n, title, children }: { id: string; n?: string; title: string; children: React.ReactNode }) {
   return (
     <section id={id} className="min-w-0 scroll-mt-16" aria-labelledby={`${id}-h`}>
-      <h2 id={`${id}-h`} className="mb-4 flex items-baseline gap-3 border-b border-line pb-2 text-lg font-semibold">
-        {n && <span className="font-mono text-accent">{n}</span>}
+      <Ruler />
+      <h2 id={`${id}-h`} className="mb-5 flex flex-wrap items-baseline gap-x-4 gap-y-1 border-t border-line pt-4 font-display text-[clamp(22px,2.4vw,30px)] font-bold leading-tight text-head">
+        {n && <span className="font-mono text-[12px] font-medium tracking-[0.16em] text-accent">{n}.</span>}
         {title}
       </h2>
       {children}
@@ -64,6 +65,7 @@ export default function Aar() {
 
   return (
     <div className="min-h-full">
+      <ExerciseStrip />
       <header className="sticky top-0 z-20 flex h-14 items-center gap-4 border-b border-line bg-panel/95 px-5 backdrop-blur">
         <Brand compact />
         <span className="font-mono text-xs text-muted">AAR · {aar.meta.scenarioTitle} · {code}</span>

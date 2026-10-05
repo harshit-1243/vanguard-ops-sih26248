@@ -255,8 +255,8 @@ function Editor({ open }: { open: boolean }) {
       <OpenModeNote open={open} />
       <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
         <div>
-          <p className="text-xs text-muted"><Link to="/scenarios" className="hover:text-ink">Scenarios</Link> / {isNew ? 'new' : 'edit'}</p>
-          <h1 className="text-xl font-semibold">{sc.title || 'Untitled scenario'} <span className="font-mono text-sm text-muted">· {sc.id}</span></h1>
+          <p className="font-mono text-[11.5px] font-medium tracking-[0.16em] text-accent"><Link to="/scenarios" className="text-accent hover:text-ink">SCENARIOS</Link> / {isNew ? 'NEW' : 'EDIT'}</p>
+          <h1 className="text-[clamp(26px,3vw,38px)] font-bold leading-tight text-head">{sc.title || 'Untitled scenario'} <span className="font-mono text-sm font-normal tracking-normal text-muted">· {sc.id}</span></h1>
         </div>
         <Button size="sm" variant="outline" onClick={() => saveBlob(new Blob([JSON.stringify(sc, null, 2)], { type: 'application/json' }), `${sc.id}.json`)}>
           <Download size={13} aria-hidden /> Export JSON

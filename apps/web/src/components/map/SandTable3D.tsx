@@ -45,7 +45,7 @@ function terrainHeight(terrain: string[], x: number, y: number): number {
   return HEIGHT[(terrain[r]?.[c] ?? '.') as TerrainCode] ?? 0.12;
 }
 
-function textSprite(text: string, color = '#dce3ea', size = 0.22): THREE.Sprite {
+function textSprite(text: string, color = '#ece6d8', size = 0.22): THREE.Sprite {
   const canvas = document.createElement('canvas');
   const ctx = canvas.getContext('2d')!;
   const font = '600 44px "IBM Plex Mono", monospace';
@@ -210,10 +210,10 @@ export default function SandTable3D(props: SandTableProps) {
     }
     table.add(new THREE.LineSegments(new THREE.BufferGeometry().setFromPoints(pts), gridMat));
     for (let i = 0; i < 8; i++) {
-      const col = textSprite(COL_LETTERS[i]!, '#93a1af', 0.3);
+      const col = textSprite(COL_LETTERS[i]!, '#b5afa0', 0.3);
       col.position.set(W(i + 0.5), 0.35, Z(-0.45));
       table.add(col);
-      const row = textSprite(String(i + 1), '#93a1af', 0.3);
+      const row = textSprite(String(i + 1), '#b5afa0', 0.3);
       row.position.set(W(-0.45), 0.35, Z(i + 0.5));
       table.add(row);
     }

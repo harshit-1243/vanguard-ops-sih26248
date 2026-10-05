@@ -6,20 +6,31 @@
 @import '@fontsource/ibm-plex-mono/500.css';
 @import '@fontsource-variable/archivo/standard.css';
 
-/* Ops-room palette: restrained slate, one amber accent (DS actions), force colours always
-   paired with shape/text so colour is never the only signal. */
+/* Night map-room palette (matches the landing page): ink slate with warm paper-tinted text, one
+   amber accent (DS actions), force colours always paired with shape/text so colour is never the
+   only signal. Corners are near-square, like map plates. */
 @theme {
   --font-sans: 'IBM Plex Sans', system-ui, sans-serif;
   --font-mono: 'IBM Plex Mono', ui-monospace, SFMono-Regular, monospace;
+  --font-display: 'Archivo Variable', 'Archivo', 'IBM Plex Sans', sans-serif;
 
-  --color-bg: #0d1217;
-  --color-panel: #131a21;
-  --color-panel2: #19222b;
-  --color-raised: #212c37;
-  --color-line: #2b3743;
-  --color-ink: #dce3ea;
-  --color-muted: #93a1af;
-  --color-faint: #7f8c99;
+  --radius-sm: 2px;
+  --radius: 3px;
+  --radius-md: 3px;
+  --radius-lg: 4px;
+  --radius-xl: 6px;
+
+  --color-bg: #0b0f13;
+  --color-panel: #11171d;
+  --color-panel2: #161e25;
+  --color-raised: #1c242b;
+  --color-line: #2a333b;
+  --color-ink: #ece6d8;
+  --color-head: #f2ecdf;
+  --color-muted: #b5afa0;
+  --color-faint: #969184;
+  --color-paper: #eee7d6;
+  --color-paper-ink: #1c1a15;
 
   --color-accent: #e5a940;
   --color-accent-ink: #1a1306;
@@ -61,6 +72,12 @@ body {
   outline-offset: 2px;
 }
 
+/* Page titles use the display face (same as the landing page). */
+h1 {
+  font-family: var(--font-display);
+  letter-spacing: -0.015em;
+}
+
 ::selection {
   background: color-mix(in srgb, var(--color-accent) 35%, transparent);
 }
@@ -94,7 +111,7 @@ body {
 .vg-map .maplibregl-canvas:focus { outline: none; }
 .vg-map:focus-visible { outline: 2px solid var(--color-accent); outline-offset: -2px; }
 .vg-marker { display: flex; flex-direction: column; align-items: center; pointer-events: none; transition: opacity 300ms; }
-.vg-label, .vg-sub { font-family: var(--font-mono); white-space: nowrap; line-height: 1.15; text-shadow: 0 0 3px #0d1217, 0 0 3px #0d1217, 0 0 2px #0d1217; }
+.vg-label, .vg-sub { font-family: var(--font-mono); white-space: nowrap; line-height: 1.15; text-shadow: 0 0 3px #0b0f13, 0 0 3px #0b0f13, 0 0 2px #0b0f13; }
 .vg-label { font-size: 10px; color: var(--color-ink); }
 .vg-sub { font-size: 9px; color: var(--color-muted); }
 .vg-axis { font-family: var(--font-mono); font-size: 12px; color: var(--color-muted); pointer-events: none; }

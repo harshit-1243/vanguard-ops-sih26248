@@ -1,5 +1,7 @@
 # Pitch notes — SIH idea PPT
 
+**Team K18** · SIH 2026 · PS SIH26248
+
 ## Problem
 - EW and cyber disruption degrade comms and situational awareness exactly when junior/mid-level commanders must decide (lessons from Ukraine; multi-domain operations such as Operation Sindoor).
 - TEWTs and CPXs assume complete, reliable information flow → officers first meet fog, delay, contradiction and isolation in contact.

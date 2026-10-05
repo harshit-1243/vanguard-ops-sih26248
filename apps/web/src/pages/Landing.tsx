@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, type CSSProperties, type FormEvent, type KeyboardEvent, type PointerEvent, type ReactNode } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { FogDrift, HeroFx, frictionDiagrams } from '@/components/landing/diagrams';
+import { TEAM } from '@/components/shell';
 import { api } from '@/lib/api';
 import { saveIdentity } from '@/lib/identity';
 import heroFog from '@/assets/landing/hero-fog.webp';
@@ -660,6 +661,7 @@ export default function Landing() {
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px 20px', font: mono(500, 11.5, 1.4), letterSpacing: '.12em', color: C.mut }}>
             <span>SIH 2026</span>
             <span>SIH26248</span>
+            <span>TEAM {TEAM}</span>
             <Link to="/ds-login" style={{ color: C.mut }}>DS LOG IN</Link>
             <Link to="/join" style={{ color: C.mut }}>JOIN</Link>
             <Link to="/scenarios" style={{ color: C.mut }}>SCENARIOS</Link>

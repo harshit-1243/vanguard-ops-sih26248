@@ -1,6 +1,6 @@
 import { useState, type FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { PageShell } from '@/components/shell';
+import { PageHeader, PageShell } from '@/components/shell';
 import { Button, Input, Label, Panel } from '@/components/ui/primitives';
 import { api } from '@/lib/api';
 import { saveIdentity } from '@/lib/identity';
@@ -23,9 +23,9 @@ export default function DsLogin() {
   };
   return (
     <PageShell>
-      <Panel className="mx-auto max-w-sm p-6">
-        <h1 className="text-lg font-semibold">Directing Staff login</h1>
-        <form className="mt-5 grid gap-4" onSubmit={submit}>
+      <PageHeader kicker="DS · SECOND SCREEN" title="Directing Staff login." sub="Open the DS console on another machine with the session code and instructor PIN." />
+      <Panel className="mx-auto max-w-md p-6">
+        <form className="grid gap-4" onSubmit={submit}>
           <div>
             <Label htmlFor="ds-code">Session code</Label>
             <Input id="ds-code" maxLength={6} className="font-mono uppercase tracking-[0.25em]" value={code} onChange={(e) => setCode(e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, ''))} />

@@ -5,7 +5,7 @@ import type { AnalyticsGroup, AnalyticsResponse, MetricSet, NarrativeBlock } fro
 import { AdminGate, AdminNav, OpenModeNote } from '@/components/admin/AdminGate';
 import { useAiStatus } from '@/components/ds/AiAdvisor';
 import { MetricCell } from '@/components/aar/Charts';
-import { PageShell } from '@/components/shell';
+import { PageHeader, PageShell } from '@/components/shell';
 import { Badge, Button, Empty, Label, Panel, SectionTitle, Select } from '@/components/ui/primitives';
 import { adminApi } from '@/lib/admin';
 
@@ -113,7 +113,7 @@ function Kpi({ label, value, sub }: { label: string; value: string; sub?: string
   return (
     <div className="rounded-lg border border-line bg-panel p-3">
       <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-muted">{label}</p>
-      <p className="mt-1 font-mono text-2xl tabular">{value}</p>
+      <p className="mt-1 font-mono text-[28px] font-medium tabular text-accent">{value}</p>
       {sub && <p className="text-[11px] text-faint">{sub}</p>}
     </div>
   );
@@ -161,11 +161,13 @@ function Dashboard({ open }: { open: boolean }) {
   return (
     <PageShell wide right={<AdminNav open={open} />}>
       <OpenModeNote open={open} />
+      <PageHeader
+        kicker="COURSE DIRECTOR · 5. ASSESSMENT"
+        title="Cross-course analytics."
+        sub="Every finished exercise, replayed from its event log and reduced to the same metrics as its AAR — compare syndicates, courses, roles and difficulty settings over time."
+        className="mb-6"
+      />
       <div className="flex flex-wrap items-end justify-between gap-3">
-        <div>
-          <h1 className="text-xl font-semibold">Cross-course analytics</h1>
-          <p className="mt-1 max-w-2xl text-sm text-muted">Every finished exercise, replayed from its event log and reduced to the same metrics as its AAR — compare syndicates, courses, roles and difficulty settings over time.</p>
-        </div>
         <div className="flex flex-wrap items-end gap-2">
           <div className="w-48">
             <Label htmlFor="f-course">Course</Label>

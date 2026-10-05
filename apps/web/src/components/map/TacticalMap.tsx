@@ -120,11 +120,11 @@ function Symbol({ m, small }: { m: MapMarker & { px: number; py: number }; small
           <line x1={-8 * s} y1={8 * s} x2={8 * s} y2={-8 * s} stroke="var(--color-unk)" strokeWidth={1.6} />
         </>
       ) : m.side === 'BLUE' ? (
-        <rect x={-w / 2} y={-h / 2} width={w} height={h} rx={2} fill="color-mix(in srgb, var(--color-blue) 20%, #0d1217)" stroke={color} strokeWidth={1.8} strokeDasharray={dash} />
+        <rect x={-w / 2} y={-h / 2} width={w} height={h} rx={2} fill="color-mix(in srgb, var(--color-blue) 20%, #0b0f13)" stroke={color} strokeWidth={1.8} strokeDasharray={dash} />
       ) : m.side === 'RED' ? (
-        <rect x={-h / 1.414} y={-h / 1.414} width={h * 1.414} height={h * 1.414} transform="rotate(45)" fill="color-mix(in srgb, var(--color-red) 20%, #0d1217)" stroke={color} strokeWidth={1.8} strokeDasharray={dash} />
+        <rect x={-h / 1.414} y={-h / 1.414} width={h * 1.414} height={h * 1.414} transform="rotate(45)" fill="color-mix(in srgb, var(--color-red) 20%, #0b0f13)" stroke={color} strokeWidth={1.8} strokeDasharray={dash} />
       ) : (
-        <circle r={13 * s} fill="color-mix(in srgb, var(--color-unk) 18%, #0d1217)" stroke={color} strokeWidth={1.8} />
+        <circle r={13 * s} fill="color-mix(in srgb, var(--color-unk) 18%, #0b0f13)" stroke={color} strokeWidth={1.8} />
       )}
       {!m.negative && (
         <text y={3.5} textAnchor="middle" fontSize={m.glyph.length > 3 ? 8 : 9} fontFamily="var(--font-mono)" fill="var(--color-ink)" fontWeight={500}>
@@ -144,12 +144,12 @@ function Symbol({ m, small }: { m: MapMarker & { px: number; py: number }; small
         </g>
       )}
       {m.label && (
-        <text y={h / 2 + 12} textAnchor="middle" fontSize={9.5} fontFamily="var(--font-mono)" fill="var(--color-ink)" paintOrder="stroke" stroke="#0d1217" strokeWidth={3}>
+        <text y={h / 2 + 12} textAnchor="middle" fontSize={9.5} fontFamily="var(--font-mono)" fill="var(--color-ink)" paintOrder="stroke" stroke="#0b0f13" strokeWidth={3}>
           {m.label}
         </text>
       )}
       {m.sub && (
-        <text y={h / 2 + 23} textAnchor="middle" fontSize={8.5} fontFamily="var(--font-mono)" fill="var(--color-muted)" paintOrder="stroke" stroke="#0d1217" strokeWidth={3}>
+        <text y={h / 2 + 23} textAnchor="middle" fontSize={8.5} fontFamily="var(--font-mono)" fill="var(--color-muted)" paintOrder="stroke" stroke="#0b0f13" strokeWidth={3}>
           {m.sub}
         </text>
       )}
@@ -283,7 +283,7 @@ export function TacticalMap(props: TacticalMapProps) {
         const p = cellCentre(f.cell);
         return (
           <g key={f.id} pointerEvents="none" transform={`translate(${p.x * CELL} ${(p.y + 0.5) * CELL - 8})`}>
-            <text textAnchor="middle" fontSize={9} fontFamily="var(--font-mono)" fill={f.intact === false ? 'var(--color-bad)' : 'var(--color-ink)'} paintOrder="stroke" stroke="#0d1217" strokeWidth={3}>
+            <text textAnchor="middle" fontSize={9} fontFamily="var(--font-mono)" fill={f.intact === false ? 'var(--color-bad)' : 'var(--color-ink)'} paintOrder="stroke" stroke="#0b0f13" strokeWidth={3}>
               {f.label}{f.intact === false ? ' ✕ DESTROYED' : ''}
             </text>
           </g>
@@ -296,7 +296,7 @@ export function TacticalMap(props: TacticalMapProps) {
           {!j.estimate && <circle cx={j.x * CELL} cy={j.y * CELL} r={j.radius * CELL * 0.5} fill="url(#p-jam)" stroke="var(--color-red)" strokeWidth={1} />}
           <g transform={`translate(${j.x * CELL} ${j.y * CELL})`}>
             <path d="M-2 -11 L6 -2 L0 -1 L3 10 L-6 0 L0 -1 Z" fill="var(--color-red)" />
-            <text y={22} textAnchor="middle" fontSize={9} fontFamily="var(--font-mono)" fill="var(--color-red)" paintOrder="stroke" stroke="#0d1217" strokeWidth={3}>
+            <text y={22} textAnchor="middle" fontSize={9} fontFamily="var(--font-mono)" fill="var(--color-red)" paintOrder="stroke" stroke="#0b0f13" strokeWidth={3}>
               {j.label}{j.active ? '' : ' (off)'}
             </text>
           </g>
@@ -326,7 +326,7 @@ export function TacticalMap(props: TacticalMapProps) {
         <g key={r.id} transform={`translate(${r.x * CELL} ${r.y * CELL})`} opacity={r.active ? 1 : 0.45} pointerEvents="none">
           <path d="M0 -10 L9 7 L-9 7 Z" fill="none" stroke="var(--color-ok)" strokeWidth={1.6} />
           <text y={4} textAnchor="middle" fontSize={8} fill="var(--color-ok)" fontFamily="var(--font-mono)">R</text>
-          <text y={20} textAnchor="middle" fontSize={8.5} fill="var(--color-muted)" fontFamily="var(--font-mono)" paintOrder="stroke" stroke="#0d1217" strokeWidth={3}>{r.label}</text>
+          <text y={20} textAnchor="middle" fontSize={8.5} fill="var(--color-muted)" fontFamily="var(--font-mono)" paintOrder="stroke" stroke="#0b0f13" strokeWidth={3}>{r.label}</text>
         </g>
       ))}
       {/* movement */}

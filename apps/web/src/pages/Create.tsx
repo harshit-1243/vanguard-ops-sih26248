@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Check, Copy } from 'lucide-react';
 import { DEFAULT_SETTINGS, formatT, type CreateSessionResponse, type RoleId, type ScenarioListItem, type SessionSettings } from '@vanguard/shared';
-import { PageShell } from '@/components/shell';
+import { PageHeader, PageShell } from '@/components/shell';
 import { Badge, Button, Input, Label, Panel, Select } from '@/components/ui/primitives';
 import { api } from '@/lib/api';
 import { saveIdentity } from '@/lib/identity';
@@ -13,18 +13,19 @@ function CopyField({ label, value, testId }: { label: string; value: string; tes
   return (
     <div>
       <Label>{label}</Label>
-      <div className="flex items-center gap-2">
-        <output data-testid={testId} className="flex-1 rounded-md border border-line bg-bg px-4 py-3 font-mono text-2xl tracking-[0.3em] text-accent">
+      <div className="flex items-stretch gap-2">
+        <output data-testid={testId} className="flex-1 border border-accent/50 bg-bg px-5 py-4 font-mono text-[34px] font-medium leading-none tracking-[0.32em] text-accent">
           {value}
         </output>
         <Button
           variant="outline"
+          className="h-auto px-4"
           aria-label={`Copy ${label}`}
           onClick={() => {
             void navigator.clipboard?.writeText(value).then(() => setCopied(true));
           }}
         >
-          {copied ? <Check size={14} /> : <Copy size={14} />}
+          {copied ? <Check size={16} /> : <Copy size={16} />}
         </Button>
       </div>
     </div>
@@ -83,10 +84,9 @@ export default function Create() {
   if (created) {
     return (
       <PageShell>
-        <Panel className="mx-auto max-w-lg p-6">
-          <h1 className="text-lg font-semibold">Exercise created</h1>
-          <p className="mt-1 text-sm text-muted">Give trainees the session code. Keep the PIN to open the DS console on another machine.</p>
-          <div className="mt-6 grid gap-4">
+        <PageHeader kicker="DS · TABLE SET" title="Exercise created." sub="Give trainees the session code. Keep the PIN to open the DS console on another machine." />
+        <Panel className="mx-auto max-w-xl p-6">
+          <div className="grid gap-5">
             <CopyField label="Session code" value={created.code} testId="session-code" />
             <CopyField label="Instructor PIN" value={created.pin} testId="instructor-pin" />
           </div>
@@ -100,20 +100,28 @@ export default function Create() {
 
   return (
     <PageShell wide>
-      <h1 className="text-xl font-semibold">Create exercise</h1>
-      <p className="mt-1 text-sm text-muted">Choose a scenario template. All content is synthetic. <Link to="/scenarios" className="text-accent underline">Edit or build scenarios</Link></p>
-      {error && <p role="alert" className="mt-4 text-sm text-bad">{error}</p>}
-      <div className="mt-6 grid gap-6 lg:grid-cols-[1fr_1.1fr]">
+      <PageHeader
+        kicker="DS · SET THE TABLE"
+        title="Create exercise."
+        sub="Pick a scenario, seat the roles, set how thick the fog is — then share the code. All content is synthetic."
+        right={<Link to="/scenarios" className="text-sm text-accent underline underline-offset-4">Scenario library →</Link>}
+      />
+      {error && <p role="alert" className="mb-4 text-sm text-bad">{error}</p>}
+      <div className="grid gap-6 lg:grid-cols-[1fr_1.1fr]">
         <ul className="grid content-start gap-3" aria-label="Scenarios">
-          {scenarios.map((s) => (
+          <li className="font-mono text-[11.5px] font-medium tracking-[0.16em] text-accent">1. SCENARIO</li>
+          {scenarios.map((s, i) => (
             <li key={s.id}>
               <button
                 onClick={() => pick(s)}
                 aria-pressed={selected?.id === s.id}
-                className={cn('w-full rounded-lg border p-4 text-left transition-colors', selected?.id === s.id ? 'border-accent bg-accent/[0.06]' : 'border-line bg-panel hover:border-muted')}
+                className={cn('w-full border p-4 text-left transition-colors', selected?.id === s.id ? 'border-accent bg-accent/[0.06] shadow-[inset_3px_0_0_var(--color-accent)]' : 'border-line bg-panel hover:border-muted')}
               >
                 <div className="flex items-center justify-between gap-2">
-                  <span className="font-semibold">{s.title}</span>
+                  <span className="flex items-baseline gap-3">
+                    <span className="font-mono text-[10px] tracking-[0.1em] text-faint" aria-hidden>{'ABCDEFGH'[i % 8]}{Math.floor(i / 8) + 1}</span>
+                    <span className="font-display text-[19px] font-bold text-head">{s.title}</span>
+                  </span>
                   <span className="flex gap-1">{s.custom && <Badge tone="accent">custom</Badge>}<Badge>{s.durationMin} min</Badge></span>
                 </div>
                 <p className="mt-1 text-xs text-muted">{s.theatre}</p>
@@ -125,15 +133,18 @@ export default function Create() {
         </ul>
         <Panel className="p-5">
           {!selected ? (
-            <p className="text-sm text-muted">Select a scenario to configure it.</p>
+            <div className="flex min-h-64 flex-col items-start justify-end gap-2 border border-dashed border-line bg-[repeating-linear-gradient(135deg,var(--color-panel2)_0_8px,var(--color-panel)_8px_16px)] p-5">
+              <p className="font-mono text-[11px] tracking-[0.14em] text-faint">2. ROLES · 3. VARIABLES</p>
+              <p className="text-sm text-muted">Select a scenario to seat the roles and set the fog.</p>
+            </div>
           ) : (
             <div className="grid gap-5">
               <div>
-                <h2 className="text-lg font-semibold">{selected.title}</h2>
+                <h2 className="font-display text-2xl font-bold text-head">{selected.title}</h2>
                 <p className="mt-1 text-sm leading-relaxed text-muted">{selected.summary}</p>
               </div>
               <fieldset>
-                <legend className="mb-2 text-[11px] font-medium uppercase tracking-wider text-muted">Roles in play ({roles.length}/6, min 2)</legend>
+                <legend className="mb-2 font-mono text-[11.5px] font-medium tracking-[0.16em] text-accent">2. ROLES <span className="text-muted">· {roles.length}/6 in play, min 2</span></legend>
                 <div className="grid gap-2">
                   {selected.roles.map((r) => {
                     const on = roles.includes(r.id);
@@ -160,7 +171,7 @@ export default function Create() {
                 </div>
               </fieldset>
               <fieldset className="grid gap-3">
-                <legend className="mb-1 text-[11px] font-medium uppercase tracking-wider text-muted">Exercise variables (difficulty)</legend>
+                <legend className="mb-1 font-mono text-[11.5px] font-medium tracking-[0.16em] text-accent">3. VARIABLES <span className="text-muted">· how thick the fog is</span></legend>
                 <div className="grid grid-cols-2 gap-3">
                   {(
                     [
