@@ -78,7 +78,9 @@ stay identical. LLM-driven OPFOR was rejected: non-deterministic, costly, hard t
 
 **D-018 · 2026-10-05 · Free-tier AI providers via one OpenAI-compatible adapter.**
 `LLM_PROVIDER=groq|cerebras|xai|openai` share a raw-HTTP chat-completions adapter (presets: Groq
-`llama-3.3-70b-versatile`, Cerebras `llama-3.3-70b`, xAI `grok-3-mini`; override with `LLM_MODEL`).
+`openai/gpt-oss-120b`, Cerebras `gpt-oss-120b`, xAI `grok-3-mini`; override with `LLM_MODEL`). Updated
+2026-10-05: Groq retired the Llama 3.3 70B default; gpt-oss runs with `reasoning_effort: low`, 429s are
+retried honouring Retry-After, and AAR drafting has a 45 s budget so free-tier limits never hang a page.
 Anthropic and Ollama remain. AAR AI drafts run only for ended exercises to protect free quotas.
 
 **D-019 · 2026-10-05 · Clock checkpoints.** A `CLOCK_CHECKPOINT` input event (no state change) is

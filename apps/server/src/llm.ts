@@ -19,7 +19,14 @@ import type { Config } from './config';
 export interface LlmProvider {
   readonly name: string;
   generate(system: string, prompt: string): Promise<string>;
+  /** Last failure (no secrets) and last success — surfaced on /api/ai/status for diagnosis. */
+  lastError?: string | null;
+  lastOkAt?: string | null;
 }
+
+const MAX_RETRIES = 2;
+const MAX_RETRY_WAIT_MS = 15_000;
+const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 const TIMEOUT_MS = 30_000;
 
@@ -86,6 +93,8 @@ export class OllamaProvider implements LlmProvider {
 /** OpenAI-compatible chat-completions API (Groq, Cerebras, xAI Grok, or any compatible endpoint). */
 export class OpenAiCompatibleProvider implements LlmProvider {
   readonly name: string;
+  lastError: string | null = null;
+  lastOkAt: string | null = null;
   constructor(
     label: string,
     private readonly baseUrl: string,
@@ -96,33 +105,56 @@ export class OpenAiCompatibleProvider implements LlmProvider {
   }
 
   async generate(system: string, prompt: string): Promise<string> {
+    try {
+      const text = await this.call(system, prompt);
+      this.lastOkAt = new Date().toISOString();
+      return text;
+    } catch (err) {
+      this.lastError = `${new Date().toISOString()} ${err instanceof Error ? err.message : String(err)}`.slice(0, 300);
+      throw err;
+    }
+  }
+
+  private async call(system: string, prompt: string): Promise<string> {
     const base = this.baseUrl.endsWith('/') ? this.baseUrl.slice(0, -1) : this.baseUrl;
-    const res = await fetch(`${base}/chat/completions`, {
-      method: 'POST',
-      headers: { 'content-type': 'application/json', authorization: `Bearer ${this.apiKey}` },
-      body: JSON.stringify({
-        model: this.model,
-        temperature: 0.3,
-        max_tokens: 1200,
-        messages: [
-          { role: 'system', content: system },
-          { role: 'user', content: prompt },
-        ],
-      }),
-      signal: AbortSignal.timeout(TIMEOUT_MS),
+    // Reasoning models (gpt-oss) spend tokens thinking first: keep effort low and leave headroom.
+    const reasoning = /gpt-oss/.test(this.model);
+    const body = JSON.stringify({
+      model: this.model,
+      temperature: 0.3,
+      max_tokens: reasoning ? 2500 : 1200,
+      ...(reasoning ? { reasoning_effort: 'low' } : {}),
+      messages: [
+        { role: 'system', content: system },
+        { role: 'user', content: prompt },
+      ],
     });
-    if (!res.ok) throw new Error(`${this.name} HTTP ${res.status}: ${(await res.text()).slice(0, 200)}`);
-    const data = (await res.json()) as { choices?: { message?: { content?: string } }[] };
-    const text = (data.choices?.[0]?.message?.content ?? '').trim();
-    if (!text) throw new Error('Empty response');
-    return text;
+    for (let attempt = 0; ; attempt++) {
+      const res = await fetch(`${base}/chat/completions`, {
+        method: 'POST',
+        headers: { 'content-type': 'application/json', authorization: `Bearer ${this.apiKey}` },
+        body,
+        signal: AbortSignal.timeout(TIMEOUT_MS),
+      });
+      // Free tiers rate-limit per minute: honour Retry-After a couple of times before giving up.
+      if ((res.status === 429 || res.status === 503) && attempt < MAX_RETRIES) {
+        const after = Number(res.headers.get('retry-after'));
+        await sleep(Math.min(MAX_RETRY_WAIT_MS, Number.isFinite(after) && after > 0 ? after * 1000 : 2000 * (attempt + 1)));
+        continue;
+      }
+      if (!res.ok) throw new Error(`${this.name} HTTP ${res.status}: ${(await res.text()).slice(0, 200)}`);
+      const data = (await res.json()) as { choices?: { message?: { content?: string } }[] };
+      const text = (data.choices?.[0]?.message?.content ?? '').trim();
+      if (!text) throw new Error('Empty response');
+      return text;
+    }
   }
 }
 
 /** Free-tier friendly presets; override the model with LLM_MODEL (providers rename models often). */
 export const OPENAI_COMPAT_PRESETS = {
-  groq: { baseUrl: 'https://api.groq.com/openai/v1', model: 'llama-3.3-70b-versatile' },
-  cerebras: { baseUrl: 'https://api.cerebras.ai/v1', model: 'llama-3.3-70b' },
+  groq: { baseUrl: 'https://api.groq.com/openai/v1', model: 'openai/gpt-oss-120b' },
+  cerebras: { baseUrl: 'https://api.cerebras.ai/v1', model: 'gpt-oss-120b' },
   xai: { baseUrl: 'https://api.x.ai/v1', model: 'grok-3-mini' },
 } as const;
 
@@ -150,6 +182,9 @@ const SYSTEM = [
   'real-world places, real operations, weapons data or technical electronic-warfare detail. Plain text only.',
 ].join(' ');
 
+/** Time budget for AI drafting of one AAR (the page waits for it once, then it is cached). */
+const ENRICH_BUDGET_MS = 45_000;
+
 const cap = (s: string, n: number) => (s.length > n ? `${s.slice(0, n - 1)}…` : s);
 
 /** Narrative + per-decision feedback drafts. Falls back to the template blocks on any error. */
@@ -174,8 +209,11 @@ export function makeEnricher(provider: LlmProvider | null, log: { warn: (o: unkn
         return aar.q4.narrative;
       });
     const feedback = { ...aar.q4.rationaleFeedback };
-    const decisions = aar.q3.decisions.slice(0, 12);
+    const decisions = aar.q3.decisions.slice(0, 10);
+    // Bounded: decisions not started within the budget keep their template feedback.
+    const deadline = Date.now() + ENRICH_BUDGET_MS;
     const work = decisions.map((d) => async () => {
+      if (Date.now() > deadline) return;
       const f = {
         role: d.role, action: d.action, target: d.targetCell, confidence: d.confidence, rationale: d.rationale,
         cutOff: d.cutOff, intelHeld: d.knowable.intel.length, openConflicts: d.knowable.openConflicts.map((c) => c.reason),
@@ -191,7 +229,7 @@ export function makeEnricher(provider: LlmProvider | null, log: { warn: (o: unkn
     });
     // Small concurrency limit to stay polite to the provider.
     const queue = [...work];
-    await Promise.all(Array.from({ length: 3 }, async () => {
+    await Promise.all(Array.from({ length: 2 }, async () => {
       for (let job = queue.shift(); job; job = queue.shift()) await job();
     }));
     return { ...aar, q4: { ...aar.q4, narrative: await narrativeP, rationaleFeedback: feedback } };

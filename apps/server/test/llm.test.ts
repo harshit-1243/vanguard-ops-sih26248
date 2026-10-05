@@ -116,7 +116,7 @@ describe('AI endpoints', () => {
   it('status + DS-only report variants; drafted texts flow into a CONFLICT inject', async () => {
     const srv = await startServer();
     try {
-      expect((await srv.api('GET', '/api/ai/status')).body).toMatchObject({ provider: 'none', enabled: false, ready: true });
+      expect((await srv.api('GET', '/api/ai/status')).body).toMatchObject({ provider: 'none', enabled: false, ready: true, lastError: null });
       const { code, instructorToken } = await createSession(srv);
       expect((await srv.api('POST', `/api/sessions/${code}/ai/report-variants`, { cell: 'D6' })).status).toBe(401);
       const r = await srv.api<{ contradictory: [string, string] }>('POST', `/api/sessions/${code}/ai/report-variants`, { cell: 'D6' }, instructorToken);
@@ -142,8 +142,8 @@ describe('OpenAI-compatible providers (Groq / Cerebras / xAI)', () => {
   it('selects presets only when a key is present, honours overrides', async () => {
     const { OpenAiCompatibleProvider } = await import('../src/llm');
     expect(createProvider(loadConfig({ LLM_PROVIDER: 'groq' }))).toBeNull();
-    expect(createProvider(loadConfig({ LLM_PROVIDER: 'groq', GROQ_API_KEY: 'k' }))!.name).toBe('groq:llama-3.3-70b-versatile');
-    expect(createProvider(loadConfig({ LLM_PROVIDER: 'cerebras', CEREBRAS_API_KEY: 'k' }))!.name).toBe('cerebras:llama-3.3-70b');
+    expect(createProvider(loadConfig({ LLM_PROVIDER: 'groq', GROQ_API_KEY: 'k' }))!.name).toBe('groq:openai/gpt-oss-120b');
+    expect(createProvider(loadConfig({ LLM_PROVIDER: 'cerebras', CEREBRAS_API_KEY: 'k' }))!.name).toBe('cerebras:gpt-oss-120b');
     expect(createProvider(loadConfig({ LLM_PROVIDER: 'xai', XAI_API_KEY: 'k', LLM_MODEL: 'grok-x' }))!.name).toBe('xai:grok-x');
     expect(createProvider(loadConfig({ LLM_PROVIDER: 'openai', LLM_API_KEY: 'k' }))).toBeNull();
     expect(createProvider(loadConfig({ LLM_PROVIDER: 'openai', LLM_API_KEY: 'k', LLM_BASE_URL: 'http://x/v1', LLM_MODEL: 'm' }))).toBeInstanceOf(OpenAiCompatibleProvider);
@@ -159,8 +159,23 @@ describe('OpenAI-compatible providers (Groq / Cerebras / xAI)', () => {
     expect(url).toBe('https://api.groq.com/openai/v1/chat/completions');
     expect((init.headers as Record<string, string>).authorization).toBe('Bearer secret');
     expect(JSON.parse(String(init.body))).toMatchObject({ model: 'llama-3.3-70b-versatile', messages: [{ role: 'system', content: 'sys' }, { role: 'user', content: 'hi' }] });
-    vi.stubGlobal('fetch', vi.fn(async () => new Response('rate limited', { status: 429 })));
+    // 429: retried (honouring Retry-After), then surfaced with lastError set
+    const limited = vi.fn(async () => new Response('rate limited', { status: 429, headers: { 'retry-after': '0.01' } }));
+    vi.stubGlobal('fetch', limited);
     await expect(p.generate('s', 'p')).rejects.toThrow(/HTTP 429/);
+    expect(limited).toHaveBeenCalledTimes(3);
+    expect(p.lastError).toMatch(/HTTP 429/);
+    expect(p.lastOkAt).not.toBeNull();
+    const flaky = vi.fn()
+      .mockResolvedValueOnce(new Response('busy', { status: 429, headers: { 'retry-after': '0.01' } }))
+      .mockResolvedValueOnce(new Response(JSON.stringify({ choices: [{ message: { content: 'ok after retry' } }] }), { status: 200 }));
+    vi.stubGlobal('fetch', flaky);
+    expect(await p.generate('s', 'p')).toBe('ok after retry');
+    // reasoning models get low effort + headroom
+    const reasoningFetch = vi.fn(async () => new Response(JSON.stringify({ choices: [{ message: { content: 'x' } }] }), { status: 200 }));
+    vi.stubGlobal('fetch', reasoningFetch);
+    await new OpenAiCompatibleProvider('groq', 'https://api.groq.com/openai/v1', 'k', 'openai/gpt-oss-120b').generate('s', 'p');
+    expect(JSON.parse(String((reasoningFetch.mock.calls[0] as unknown as [string, RequestInit])[1].body))).toMatchObject({ reasoning_effort: 'low', max_tokens: 2500 });
     vi.stubGlobal('fetch', vi.fn(async () => new Response(JSON.stringify({ choices: [] }), { status: 200 })));
     await expect(p.generate('s', 'p')).rejects.toThrow(/Empty/);
   });

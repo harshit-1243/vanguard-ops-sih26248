@@ -180,7 +180,7 @@ export async function buildApp(
 
   // ---- Optional AI layer ----
   // requested/keyPresent help diagnose deployment config without revealing the key.
-  app.get('/api/ai/status', async () => ({ provider: llm?.name ?? 'none', enabled: !!llm, requested: config.LLM_PROVIDER, ready: config.LLM_PROVIDER === 'none' || !!llm }));
+  app.get('/api/ai/status', async () => ({ provider: llm?.name ?? 'none', enabled: !!llm, requested: config.LLM_PROVIDER, ready: config.LLM_PROVIDER === 'none' || !!llm, lastOkAt: llm?.lastOkAt ?? null, lastError: llm?.lastError ?? null }));
   registerAdminRoutes(app, { adminKey: config.ADMIN_KEY, scenarios, store: st, llm });
   app.post('/api/sessions/:code/ai/advisor', async (req, reply) => {
     const s = await sessionOr404((req.params as { code: string }).code);
