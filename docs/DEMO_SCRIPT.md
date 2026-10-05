@@ -1,13 +1,13 @@
 # 3-minute judge demo
 
-**Setup (before judges arrive):** the app open on a laptop (local `pnpm start` or the deployed URL), plus
+**Setup (before judges arrive):** if using the Render URL, open it once ~2 minutes early (free tier sleeps when idle). Unlock *Scenarios*/*Analytics* with your ADMIN_KEY in the same browser beforehand. the app open on a laptop (local `pnpm start` or the deployed URL), plus
 two more browser windows or devices. In window A: *Create exercise* → Iron Bridge → note the code. In
 windows B/C: *Join* as **KESTREL 6 (CDR)** and **KESTREL 2 (PL B)**. Keep a fourth tab ready on the
 landing page for the finished-demo AAR.
 
 | Time | Screen | Do | Say |
 |---|---|---|---|
-| 0:00 | Landing | — | "Contemporary conflicts show EW and cyber degrade comms exactly when junior commanders must decide. TEWTs and CPXs assume perfect information. VANGUARD OPS trains deciding under fog." |
+| 0:00 | Landing | Drag the hero divider from right to left | "Same sand model, two truths: on the left what really is there, on the right what KESTREL 2 sees — fog, a stale contact, a jammed link, decoys reported as armour. Contemporary conflicts show EW and cyber degrade comms exactly when junior commanders must decide. TEWTs and CPXs assume perfect information. VANGUARD OPS trains deciding under fog." |
 | 0:15 | DS console (A) | Show roster (2 trainees online) → **Start exercise** → **×4** | "This is a closed wargame. The DS sees ground truth — including that these 5 'tanks' at D6 are decoys." (point at dashed decoy diamond) |
 | 0:35 | CDR (B) | Show map + Intel tab | "The commander sees something else: a UAV report of 5 armour at D6 *and* a ground sensor saying no vehicles — side by side, flagged as a conflict, each with source and age." |
 | 0:55 | DS (A) | Map tool **place jammer** → click **G2** → Activate | "I put a hostile jammer here. Link degradation is computed from geometry and band, not a toggle." Point at the red ✕ on the CDR–PL B link. |
@@ -15,9 +15,9 @@ landing page for the finished-demo AAR.
 | 1:35 | DS (A) | **Decisions** tab → expand the new decision | "The DS sees it live with a ground-truth badge — and what PL B could actually know at that moment." Click **PL_B ✕** in *View as*: "I can see exactly his screen." |
 | 1:45 | DS (A) | **3D · VR**, then **Injects → Suggest next inject** | "Same data as a 3D sand table — on a Quest or Android phone it opens in VR/AR; trainees get the 3D view of *their* picture only." Back to **Map**: "The AI advisor proposes the next friction for a training objective — one click to apply." |
 | 1:55 | DS (A) | **Freeze & probe** | "SAGAT freeze: screens blank, everyone answers questions about the situation, scored against truth — individual SA and how far the team's pictures diverge." (Show the probe on B, then **Score & resume**.) |
-| 2:15 | Demo AAR tab | Landing → **See a finished demo exercise and its AAR** | "Here's a full 21-minute exercise. AAR follows the four Army questions." Scroll: exec summary, swimlanes. |
+| 2:15 | Demo AAR tab | Landing → **Watch a finished exercise’s debrief** | "Here's a full 21-minute exercise. AAR follows the four Army questions." Scroll: exec summary, swimlanes. |
 | 2:35 | AAR | Decision card → **Reveal ground truth** | "Hindsight-safe: we judge on what was knowable, then reveal truth. Confidence is calibrated — Brier score." |
-| 2:50 | AAR | Click **PDF** | "Exportable PDF, JSON event log and CSV. Fully offline in Docker; AI is optional." |
+| 2:50 | AAR | Click **PDF** | "Exportable PDF, JSON event log and CSV. Fully offline in Docker; AI is optional." If time: open **Analytics** — "every exercise across courses, by role and difficulty" — and **Scenarios** — "course directors write their own scenarios, validated with a dry run". |
 
 ## Judge Q&A cheat-sheet
 
