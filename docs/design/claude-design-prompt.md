@@ -1,4 +1,4 @@
-# Claude Design prompt — VANGUARD OPS landing page (v2)
+# Claude Design prompt — VANGUARD OPS landing page (v3: with hero images)
 
 ## How to use
 1. Open claude.ai/design and start a new project.
@@ -11,7 +11,11 @@
    - `docs/screenshots/18-cross-course-analytics.png`
    - your Agrivue screenshot. Type next to it: **"Reference for structure and energy only. Do not copy
      its art style, colours, fonts or theme."**
-   - optional: the hero illustration you generated with Prompt B (at the bottom of this file).
+   - **hero-sandtable.png**: your cinematic sand-model image (lamp, river, bridge, fog on the right).
+   - optional **hero-sandtable-clear.png**: the same image with the fog removed (see "Prompt C" at the
+     bottom).
+   - optional **sandmodel-topdown.png**: your second, top-down image, cropped so the Gemini sparkle
+     in the bottom-right corner is gone.
 3. If it offers web capture, give it https://vanguard-ops-0uex.onrender.com.
 4. Paste **Prompt A** and send.
 5. Iterate in small steps ("make the hero headline larger", "less amber"). Don't re-paste the whole
@@ -79,12 +83,26 @@ The product's one idea is **same battlefield, different truths**, and it lives i
   Dragging it is the whole pitch in one gesture. On mobile it becomes three tabs: GROUND TRUTH ·
   KESTREL 6 (CDR) · KESTREL 2 (PL B).
 
-How to render the world: an attached hero illustration if I provided one. Otherwise build it as a
-**layered isometric SVG**, like a laser-cut topographic model: stacked contour plates in sand, khaki
-and slate tones, plus miniature blocks with NATO-style symbols (friendly = blue rectangle frame,
-hostile = red diamond frame, decoy = dashed frame). Light it like a briefing room at dusk: warm
-overhead lamp, long soft shadows. In the build it may be swapped for the product's live 3D sand
-table.
+**Use the attached images. Do not draw the world from scratch.**
+- **hero-sandtable.png** is the hero: full-bleed, `object-fit: cover`, focal point about 45 % across
+  and 55 % down (the bridge). The left side shows crisp blue friendly blocks on the ridge; the right
+  side shows red hostile blocks, a red jamming ring and fog. That split *is* the product idea; keep
+  both halves visible at every desktop width.
+- The dark wall at the top-left is where the headline goes. Add a left-to-right ink gradient
+  (#0B0F13 at about 85 % → transparent by 55 % of the width) plus a soft bottom fade, so text passes
+  WCAG AA without hiding the model.
+- **If hero-sandtable-clear.png is attached**, build the divider as a real reveal. Stack the two
+  images; the clear one is clipped with `clip-path: inset(0 X 0 0)` from the left up to the divider,
+  and labelled GROUND TRUTH. The foggy one shows on the right, labelled "WHAT KESTREL 2 SEES". On top,
+  add small SVG callouts pinned to the image: "5× ARMOUR?" over the red blocks, "AGE 4 MIN" on one
+  contact, "LINK JAMMED" on the red ring. They appear only on the fog side. **If it is not
+  attached**, keep the single image and make the divider move a frosted fog layer
+  (`backdrop-filter: blur` + noise texture) over it instead.
+- **sandmodel-topdown.png**, if attached, goes in "Three seats at the table" or "Built for a closed
+  network" as a framed, smaller photo. It is not a second hero.
+- Mobile: crop the hero to the bridge and town, put the headline above the image rather than over
+  it, and turn the divider into the three tabs.
+- Ship the images as WebP (hero ≤ 400 KB at 1920 px).
 
 ### Hero composition
 - **Floating nav bar** over the scene:
@@ -190,6 +208,17 @@ Before designing, write a 5-line rationale: concept, hero interaction, type pair
 the one detail that will make an officer stop scrolling. Then design.
 
 ---
+
+## Prompt C — make the "clear" twin of your hero (Gemini / ChatGPT image edit)
+
+Upload hero-sandtable.png to the same tool that made it and send:
+
+> Edit this exact image. Remove all of the fog, mist and smoke so the whole terrain model is crisp and
+> clearly lit, especially the right half. Keep everything else identical: same camera angle, framing,
+> lamp, lighting, colours, terrain, river, bridge, buildings, trees, every blue and red block, every
+> flag and the red ring. Do not add, move or remove any object. Same resolution.
+
+If the result shifts the layout (things move), discard it. The single-image fog version still works.
 
 ## Prompt B — optional hero illustration (any image generator, e.g. Gemini / ChatGPT image)
 
