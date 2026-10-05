@@ -1,0 +1,36 @@
+# Render Blueprint — one Docker web service (WebSockets supported natively) + Render Postgres.
+# Render → New → Blueprint → select this repo. See README › Deploy.
+services:
+  - type: web
+    name: vanguard-ops
+    runtime: docker
+    plan: free
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    healthCheckPath: /healthz
+    autoDeploy: true
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: vanguard-db
+          property: connectionString
+      # Seed a finished demo exercise on first boot so the AAR can be shown instantly.
+      - key: SEED_DEMO_ON_EMPTY
+        value: 'true'
+      - key: TICK_HZ
+        value: '1'
+      - key: LOG_LEVEL
+        value: info
+      # Optional AI layer. Leave LLM_PROVIDER=none (fully functional, template text) unless you add a key.
+      - key: LLM_PROVIDER
+        value: none
+      - key: ANTHROPIC_MODEL
+        value: claude-opus-5-5
+      - key: ANTHROPIC_API_KEY
+        sync: false
+
+databases:
+  - name: vanguard-db
+    plan: free
+    databaseName: vanguard
+    user: vanguard
