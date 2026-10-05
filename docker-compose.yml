@@ -1,0 +1,52 @@
+# VANGUARD OPS — full offline stack.
+#   docker compose up --build          # app on http://localhost:8080 + PostgreSQL
+#   docker compose --profile ai up     # also start a local Ollama (set LLM_PROVIDER=ollama)
+# After the images are built/pulled once, everything runs with no internet access.
+
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: vanguard
+      POSTGRES_PASSWORD: vanguard
+      POSTGRES_DB: vanguard
+      POSTGRES_INITDB_ARGS: --encoding=UTF8
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U vanguard -d vanguard']
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    restart: unless-stopped
+
+  app:
+    build: .
+    image: vanguard-ops:local
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql://vanguard:vanguard@db:5432/vanguard
+      SEED_DEMO_ON_EMPTY: 'true'
+      TICK_HZ: '1'
+      LLM_PROVIDER: ${LLM_PROVIDER:-none}
+      OLLAMA_URL: http://ollama:11434
+      OLLAMA_MODEL: ${OLLAMA_MODEL:-llama3.2}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+      ANTHROPIC_MODEL: ${ANTHROPIC_MODEL:-claude-opus-5-5}
+    ports:
+      - '8080:8080'
+    restart: unless-stopped
+
+  ollama:
+    image: ollama/ollama:latest
+    profiles: ['ai']
+    volumes:
+      - ollama:/root/.ollama
+    ports:
+      - '11434:11434'
+
+volumes:
+  pgdata:
+  ollama:

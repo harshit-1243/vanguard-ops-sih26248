@@ -42,7 +42,7 @@ export function loadConfig(
   const parsed = EnvSchema.parse(env);
   const scenariosDir =
     overrides.scenariosDir ??
-    parsed.SCENARIOS_DIR ??
+    (parsed.SCENARIOS_DIR ? path.resolve(parsed.SCENARIOS_DIR) : undefined) ??
     firstExisting([
       path.resolve(here, '../../../scenarios'),
       path.resolve(process.cwd(), 'scenarios'),
@@ -50,7 +50,7 @@ export function loadConfig(
     ]);
   const webDist =
     overrides.webDist ??
-    parsed.WEB_DIST ??
+    (parsed.WEB_DIST ? path.resolve(parsed.WEB_DIST) : undefined) ??
     firstExisting([
       path.resolve(here, '../../web/dist'),
       path.resolve(process.cwd(), 'apps/web/dist'),

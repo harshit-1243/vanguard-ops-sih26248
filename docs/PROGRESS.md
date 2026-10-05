@@ -57,8 +57,15 @@
 - Lighthouse accessibility: 100 on landing, create, join (run against the prod build via a debug-port Chromium).
 - Map clicks now resolve from SVG coordinates (clicking a sector under a marker or link line selects it).
 
+## Phase 9 — Packaging ✅ (2026-10-05, Docker run pending)
+- Multi-stage `Dockerfile` (node:20-bookworm-slim, pnpm 9, `pnpm deploy --prod`, Prisma client for debian-openssl-3, non-root, HEALTHCHECK on /healthz) — server serves the built SPA.
+- `docker-entrypoint.sh`: `prisma migrate deploy` when DATABASE_URL is set, then start. `docker-compose.yml`: app + postgres:16-alpine (UTF-8, healthcheck, volume) + optional `ai` profile (Ollama). SEED_DEMO_ON_EMPTY=true seeds a finished exercise on first boot.
+- `pnpm seed:demo` (tsx) and bundled `dist/seed-demo.js` (inside the container: `docker compose exec app node server/dist/seed-demo.js`); without a DB it writes the AAR PDF + event log to ./.data/.
+- **Verified natively (Docker is not installed on this machine):** built → `pnpm deploy --prod` → `prisma generate` in the deploy dir → migrations applied to a fresh UTF-8 Postgres → deployed bundle starts (store=postgres), seeds the demo, serves the SPA and API → restarted: no re-seed, AAR + PDF rebuilt from the Postgres event log. Fixed: relative SCENARIOS_DIR/WEB_DIST now resolved to absolute paths.
+- **Not yet verified:** `docker build` / `docker compose up` themselves — will be exercised by the CI docker job (Phase 10) and can be run locally after installing Docker Desktop.
+
 ## Pending
-- Phase 9 packaging → Phase 12 handover.
+- Phase 10 GitHub (needs repo name/visibility + gh) → Phase 12 handover.
 
 ## Known issues
 - None yet.
