@@ -12,7 +12,7 @@
    - your Agrivue screenshot. Type next to it: **"Reference for structure and energy only. Do not copy
      its art style, colours, fonts or theme."**
    - **hero-sandtable.png**: your cinematic sand-model image (lamp, river, bridge, fog on the right).
-   - optional **hero-sandtable-clear.png**: the same image with the fog removed (see "Prompt C" at the
+   - optional **hero-sandtable-clear.webp**: the same image with the fog removed (see "Prompt C" at the
      bottom).
    - optional **sandmodel-topdown.png**: your second, top-down image, cropped so the Gemini sparkle
      in the bottom-right corner is gone.
@@ -91,7 +91,7 @@ The product's one idea is **same battlefield, different truths**, and it lives i
 - The dark wall at the top-left is where the headline goes. Add a left-to-right ink gradient
   (#0B0F13 at about 85 % → transparent by 55 % of the width) plus a soft bottom fade, so text passes
   WCAG AA without hiding the model.
-- **If hero-sandtable-clear.png is attached**, build the divider as a real reveal. Stack the two
+- **If hero-sandtable-clear.webp is attached**, build the divider as a real reveal. Stack the two
   images; the clear one is clipped with `clip-path: inset(0 X 0 0)` from the left up to the divider,
   and labelled GROUND TRUTH. The foggy one shows on the right, labelled "WHAT KESTREL 2 SEES". On top,
   add small SVG callouts pinned to the image: "5× ARMOUR?" over the red blocks, "AGE 4 MIN" on one
