@@ -75,6 +75,7 @@ export class LiveSession {
     enabledRoles: RoleId[] | undefined,
     opts: SessionOptions,
     settings: SessionSettings = DEFAULT_SETTINGS,
+    course = '',
   ): Promise<{ session: LiveSession; pin: string; instructorToken: string }> {
     const sim = new Simulation(scenario, seed, enabledRoles, settings);
     const pin = newPin();
@@ -89,6 +90,7 @@ export class LiveSession {
       instructorTokenHashes: [hashSecret(instructorToken)],
       enabledRoles: [...sim.state.enabledRoles],
       scenario,
+      course,
       createdAt: new Date(),
       endedAt: null,
     };
@@ -96,7 +98,7 @@ export class LiveSession {
     const session = new LiveSession(record, scenario, sim, store, opts);
     session.emit('SYSTEM', {
       type: 'SESSION_CREATED',
-      payload: { scenarioId: scenario.id, seed, enabledRoles: record.enabledRoles, settings },
+      payload: { scenarioId: scenario.id, seed, enabledRoles: record.enabledRoles, settings, ...(course ? { course } : {}) },
     });
     await session.flush();
     return { session, pin, instructorToken };

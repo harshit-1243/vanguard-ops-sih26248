@@ -30,6 +30,6 @@ export default defineConfig({
     url: `http://127.0.0.1:${PORT}/healthz`,
     reuseExistingServer: !process.env.CI,
     timeout: 60_000,
-    env: { PORT: String(PORT), HOST: '127.0.0.1', LOG_LEVEL: 'warn', TICK_HZ: '1', DATABASE_URL: process.env.E2E_DATABASE_URL ?? '', LLM_PROVIDER: 'none' },
+    env: { PORT: String(PORT), HOST: '127.0.0.1', LOG_LEVEL: 'warn', TICK_HZ: '1', DATABASE_URL: process.env.E2E_DATABASE_URL ?? '', LLM_PROVIDER: 'none', ADMIN_KEY: 'e2e-course-director-key' },
   },
 });

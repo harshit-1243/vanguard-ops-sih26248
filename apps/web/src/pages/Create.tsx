@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Check, Copy } from 'lucide-react';
-import { DEFAULT_SETTINGS, formatT, type CreateSessionResponse, type RoleId, type ScenarioSummary, type SessionSettings } from '@vanguard/shared';
+import { DEFAULT_SETTINGS, formatT, type CreateSessionResponse, type RoleId, type ScenarioListItem, type SessionSettings } from '@vanguard/shared';
 import { PageShell } from '@/components/shell';
 import { Badge, Button, Input, Label, Panel, Select } from '@/components/ui/primitives';
 import { api } from '@/lib/api';
@@ -32,10 +32,17 @@ function CopyField({ label, value, testId }: { label: string; value: string; tes
 }
 
 export default function Create() {
-  const [scenarios, setScenarios] = useState<ScenarioSummary[]>([]);
-  const [selected, setSelected] = useState<ScenarioSummary | null>(null);
+  const [scenarios, setScenarios] = useState<ScenarioListItem[]>([]);
+  const [selected, setSelected] = useState<ScenarioListItem | null>(null);
   const [roles, setRoles] = useState<RoleId[]>([]);
   const [seed, setSeed] = useState('');
+  const [course, setCourse] = useState(() => {
+    try {
+      return localStorage.getItem('vg-course') ?? '';
+    } catch {
+      return '';
+    }
+  });
   const [settings, setSettings] = useState<SessionSettings>(DEFAULT_SETTINGS);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -46,7 +53,7 @@ export default function Create() {
     api.scenarios().then(setScenarios).catch((e: Error) => setError(e.message));
   }, []);
 
-  const pick = (s: ScenarioSummary) => {
+  const pick = (s: ScenarioListItem) => {
     setSelected(s);
     setRoles(s.roles.filter((r) => !r.optional).map((r) => r.id));
     setSeed(String(s.defaultSeed));
@@ -58,7 +65,12 @@ export default function Create() {
     setBusy(true);
     setError(null);
     try {
-      const r = await api.create(selected.id, roles, seed ? Number(seed) : undefined, settings);
+      try {
+        localStorage.setItem('vg-course', course.trim());
+      } catch {
+        /* per-browser convenience only */
+      }
+      const r = await api.create(selected.id, roles, seed ? Number(seed) : undefined, settings, course);
       saveIdentity(r.code, { token: r.instructorToken, actor: 'DS', pin: r.pin });
       setCreated(r);
     } catch (e) {
@@ -89,7 +101,7 @@ export default function Create() {
   return (
     <PageShell wide>
       <h1 className="text-xl font-semibold">Create exercise</h1>
-      <p className="mt-1 text-sm text-muted">Choose a scenario template. All content is synthetic.</p>
+      <p className="mt-1 text-sm text-muted">Choose a scenario template. All content is synthetic. <Link to="/scenarios" className="text-accent underline">Edit or build scenarios</Link></p>
       {error && <p role="alert" className="mt-4 text-sm text-bad">{error}</p>}
       <div className="mt-6 grid gap-6 lg:grid-cols-[1fr_1.1fr]">
         <ul className="grid content-start gap-3" aria-label="Scenarios">
@@ -102,7 +114,7 @@ export default function Create() {
               >
                 <div className="flex items-center justify-between gap-2">
                   <span className="font-semibold">{s.title}</span>
-                  <Badge>{s.durationMin} min</Badge>
+                  <span className="flex gap-1">{s.custom && <Badge tone="accent">custom</Badge>}<Badge>{s.durationMin} min</Badge></span>
                 </div>
                 <p className="mt-1 text-xs text-muted">{s.theatre}</p>
                 <p className="mt-2 line-clamp-3 text-xs leading-relaxed text-muted">{s.summary}</p>
@@ -181,9 +193,15 @@ export default function Create() {
                   </ul>
                 </details>
               </fieldset>
-              <div className="max-w-40">
-                <Label htmlFor="seed">Seed (replayable)</Label>
-                <Input id="seed" inputMode="numeric" value={seed} onChange={(e) => setSeed(e.target.value.replace(/\D/g, ''))} />
+              <div className="grid grid-cols-[1fr_10rem] gap-3">
+                <div>
+                  <Label htmlFor="course">Course / syndicate (for analytics)</Label>
+                  <Input id="course" maxLength={60} placeholder="e.g. DSSC-81 Syndicate 4" value={course} onChange={(e) => setCourse(e.target.value)} />
+                </div>
+                <div>
+                  <Label htmlFor="seed">Seed (replayable)</Label>
+                  <Input id="seed" inputMode="numeric" value={seed} onChange={(e) => setSeed(e.target.value.replace(/\D/g, ''))} />
+                </div>
               </div>
               <Button variant="primary" size="lg" disabled={busy || roles.length < 2} onClick={create}>
                 {busy ? 'Creating…' : 'Create exercise'}

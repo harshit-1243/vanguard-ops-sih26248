@@ -10,3 +10,4 @@ export * from './picture';
 export * from './instructor';
 export * from './aar';
 export * from './format';
+export * from './admin';

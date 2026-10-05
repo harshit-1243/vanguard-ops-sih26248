@@ -17,6 +17,9 @@ services:
       # Seed a finished demo exercise on first boot so the AAR can be shown instantly.
       - key: SEED_DEMO_ON_EMPTY
         value: 'true'
+      # Course-director key for the scenario editor + analytics (generated; read it in the dashboard).
+      - key: ADMIN_KEY
+        generateValue: true
       - key: TICK_HZ
         value: '1'
       - key: LOG_LEVEL

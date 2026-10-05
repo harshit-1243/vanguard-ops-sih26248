@@ -12,6 +12,7 @@ import {
   RoleIdSchema,
   SessionCodeSchema,
 } from '@vanguard/shared';
+import { registerAdminRoutes } from './admin';
 import { advise } from './advisor';
 import { aarFor, decisionsCsv, eventsJson, replayFor, type AarEnricher } from './aar';
 import { RateLimiter } from './auth';
@@ -58,6 +59,8 @@ export async function buildApp(
   const st = store ?? (await createStore(config));
   await st.init();
   const scenarios = ScenarioRegistry.fromDir(config.scenariosDir);
+  const badCustom = scenarios.loadCustom(await st.listCustomScenarios());
+  if (badCustom.length) app.log.warn(`Skipped invalid custom scenarios: ${badCustom.join(', ')}`);
   const manager = new SessionManager(st, scenarios, {
     tickHz: config.TICK_HZ,
     onError: (err) => app.log.error(err, 'session error'),
@@ -110,7 +113,7 @@ export async function buildApp(
 
   app.post('/api/sessions', async (req, reply) => {
     const body = CreateSessionBodySchema.parse(req.body ?? {});
-    const created = await manager.create(body.scenarioId, body.seed, body.enabledRoles, body.settings).catch((err: unknown) => {
+    const created = await manager.create(body.scenarioId, body.seed, body.enabledRoles, body.settings, body.course ?? '').catch((err: unknown) => {
       if (err instanceof NotFound) throw err;
       if (err instanceof Error && /CDR|two roles/.test(err.message)) throw Object.assign(err, { statusCode: 400 });
       throw err;
@@ -176,7 +179,9 @@ export async function buildApp(
   app.decorate('requireAarAccess', requireAarAccess);
 
   // ---- Optional AI layer ----
-  app.get('/api/ai/status', async () => ({ provider: llm?.name ?? 'none', enabled: !!llm }));
+  // requested/keyPresent help diagnose deployment config without revealing the key.
+  app.get('/api/ai/status', async () => ({ provider: llm?.name ?? 'none', enabled: !!llm, requested: config.LLM_PROVIDER, ready: config.LLM_PROVIDER === 'none' || !!llm }));
+  registerAdminRoutes(app, { adminKey: config.ADMIN_KEY, scenarios, store: st, llm });
   app.post('/api/sessions/:code/ai/advisor', async (req, reply) => {
     const s = await sessionOr404((req.params as { code: string }).code);
     if (s.resolveToken(bearer(req)) !== 'DS') return reply.code(401).send({ error: 'DS only' });

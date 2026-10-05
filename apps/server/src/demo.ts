@@ -62,7 +62,7 @@ export async function seedDemo(
 ): Promise<{ code: string; pin: string; instructorToken: string; skipped: string[] }> {
   const skipped: string[] = [];
   const roles: RoleId[] = ['CDR', 'PL_A', 'PL_B', 'ALO', 'EW'];
-  const { session, pin, instructorToken } = await manager.create('iron-bridge', undefined, roles);
+  const { session, pin, instructorToken } = await manager.create('iron-bridge', undefined, roles, undefined, 'Demo');
   for (const r of roles) await session.join(r, DEMO_PLAYERS[r]);
   session.dsCommand({ type: 'START' });
   session.stopClock();

@@ -87,6 +87,13 @@
 - Tests: OPFOR rules, settings, checkpoint replay (sim); providers, advisor, restart resume (server). E2E clicks real map points (MapLibre via SwiftShader).
 - Awaiting user: a free Groq or Cerebras key in Render to verify the AI layer live.
 
+## Phase 14 — Scenario editor + cross-course analytics ✅ (2026-10-05)
+- Editor: library (duplicate / import / export / delete), map painter + routes, forces, roles/PACE, intent, MSEL forms, sensors, raw JSON; validation with design warnings and a full-length headless dry run (~0.5 s for 30 min).
+- Analytics: replay-and-cache of ENDED exercises; by role / course / scenario / difficulty / officer, trend chart, pitfalls with rule names, findings, optional AI summary, CSV.
+- Course label on exercises; `ADMIN_KEY` guard with rate limiting; Prisma migration `20261005000000_editor_analytics`.
+- Fixed: Iron Bridge armour started on sea (found by the new validator). Config now trims env values and ignores blanks; `/api/ai/status` reports `requested`/`ready` to diagnose deploy config.
+- Tests: +12 server (CRUD, auth, validation, dry run, analytics, CSV, restart), +2 E2E incl. axe on the new pages.
+
 ## Pending
 - Nothing blocking. Optional: set repo topics/description in the GitHub UI; fill in team names in the README.
 

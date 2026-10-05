@@ -1,5 +1,5 @@
 import type { RoleId, StoredEvent } from '@vanguard/shared';
-import type { EventStore, PlayerRecord, SessionPatch, SessionRecord } from './types';
+import type { CustomScenarioRecord, EventStore, PlayerRecord, SessionPatch, SessionRecord } from './types';
 
 /** In-process store: zero-setup local dev and tests (DECISIONS D-003). Data is lost on restart. */
 export class MemoryEventStore implements EventStore {
@@ -7,6 +7,7 @@ export class MemoryEventStore implements EventStore {
   private sessions = new Map<string, SessionRecord>();
   private events = new Map<string, StoredEvent[]>();
   private players = new Map<string, Map<RoleId, PlayerRecord>>();
+  private scenarios = new Map<string, CustomScenarioRecord>();
 
   async init(): Promise<void> {}
 
@@ -37,6 +38,27 @@ export class MemoryEventStore implements EventStore {
 
   async countSessions(): Promise<number> {
     return this.sessions.size;
+  }
+
+  async listEndedSessions(): Promise<SessionRecord[]> {
+    return [...this.sessions.values()]
+      .filter((s) => s.status === 'ENDED')
+      .sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime())
+      .map((s) => structuredClone(s));
+  }
+
+  async listCustomScenarios(): Promise<CustomScenarioRecord[]> {
+    return [...this.scenarios.values()].map((s) => structuredClone(s));
+  }
+
+  async saveCustomScenario(rec: Omit<CustomScenarioRecord, 'updatedAt'>): Promise<CustomScenarioRecord> {
+    const saved = { ...structuredClone(rec), updatedAt: new Date() };
+    this.scenarios.set(rec.id, saved);
+    return structuredClone(saved);
+  }
+
+  async deleteCustomScenario(id: string): Promise<boolean> {
+    return this.scenarios.delete(id);
   }
 
   async appendEvent(e: StoredEvent): Promise<void> {

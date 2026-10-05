@@ -1,6 +1,6 @@
 import { PrismaClient, type Prisma } from '@prisma/client';
 import type { RoleId, StoredEvent } from '@vanguard/shared';
-import type { EventStore, PlayerRecord, SessionPatch, SessionRecord, SessionStatus } from './types';
+import type { CustomScenarioRecord, EventStore, PlayerRecord, SessionPatch, SessionRecord, SessionStatus } from './types';
 
 type SessionRow = Prisma.SessionGetPayload<object>;
 
@@ -15,6 +15,7 @@ function toRecord(r: SessionRow): SessionRecord {
     instructorTokenHashes: r.instructorTokenHashes,
     enabledRoles: r.enabledRoles as RoleId[],
     scenario: r.scenario,
+    course: r.course,
     createdAt: r.createdAt,
     endedAt: r.endedAt,
   };
@@ -45,6 +46,7 @@ export class PrismaEventStore implements EventStore {
         instructorTokenHashes: rec.instructorTokenHashes,
         enabledRoles: rec.enabledRoles,
         scenario: rec.scenario as Prisma.InputJsonValue,
+        course: rec.course,
         createdAt: rec.createdAt,
         endedAt: rec.endedAt,
       },
@@ -70,6 +72,27 @@ export class PrismaEventStore implements EventStore {
 
   async countSessions(): Promise<number> {
     return this.db.session.count();
+  }
+
+  async listEndedSessions(): Promise<SessionRecord[]> {
+    const rows = await this.db.session.findMany({ where: { status: 'ENDED' }, orderBy: { createdAt: 'asc' } });
+    return rows.map(toRecord);
+  }
+
+  async listCustomScenarios(): Promise<CustomScenarioRecord[]> {
+    const rows = await this.db.customScenario.findMany({ orderBy: { createdAt: 'asc' } });
+    return rows.map((r) => ({ id: r.id, title: r.title, scenario: r.scenario, updatedAt: r.updatedAt }));
+  }
+
+  async saveCustomScenario(rec: Omit<CustomScenarioRecord, 'updatedAt'>): Promise<CustomScenarioRecord> {
+    const data = { title: rec.title, scenario: rec.scenario as Prisma.InputJsonValue };
+    const r = await this.db.customScenario.upsert({ where: { id: rec.id }, create: { id: rec.id, ...data }, update: data });
+    return { id: r.id, title: r.title, scenario: r.scenario, updatedAt: r.updatedAt };
+  }
+
+  async deleteCustomScenario(id: string): Promise<boolean> {
+    const r = await this.db.customScenario.deleteMany({ where: { id } });
+    return r.count > 0;
   }
 
   async appendEvent(e: StoredEvent): Promise<void> {

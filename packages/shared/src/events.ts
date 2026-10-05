@@ -59,6 +59,8 @@ export const InputEventBodySchema = z.discriminatedUnion('type', [
       enabledRoles: z.array(RoleIdSchema),
       settings: SessionSettingsSchema.optional(),
       scenario: z.unknown().optional(),
+      /** Course / syndicate label (analytics grouping; not used by the sim). */
+      course: z.string().max(60).optional(),
     }),
   ),
   ev('ROLE_JOINED', z.object({ roleId: RoleIdSchema, callsign: z.string() })),

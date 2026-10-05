@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { ArrowRight, FileBarChart, Radar, Shield, Users } from 'lucide-react';
+import { ArrowRight, BarChart3, FileBarChart, LibraryBig, Radar, Shield, Users } from 'lucide-react';
 import { api } from '@/lib/api';
 import { saveIdentity } from '@/lib/identity';
 import { PageShell } from '@/components/shell';
@@ -89,6 +89,11 @@ export default function Landing() {
             <Radar size={13} aria-hidden /> DS on another machine? Log in with code + PIN
           </Link>
           <DemoLink />
+          <p className="flex flex-wrap items-center gap-x-4 gap-y-1 border-t border-line pt-3 text-xs text-muted">
+            <span className="font-semibold uppercase tracking-[0.14em] text-[10px]">Course director</span>
+            <Link to="/scenarios" className="inline-flex items-center gap-1.5 hover:text-ink"><LibraryBig size={13} aria-hidden /> Scenario editor</Link>
+            <Link to="/analytics" className="inline-flex items-center gap-1.5 hover:text-ink"><BarChart3 size={13} aria-hidden /> Cross-course analytics</Link>
+          </p>
         </div>
       </section>
     </PageShell>

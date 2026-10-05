@@ -11,9 +11,9 @@ export interface TestServer extends AppContext {
   api: <T = unknown>(method: string, path: string, body?: unknown, token?: string) => Promise<{ status: number; body: T }>;
 }
 
-export async function startServer(opts: { tickHz?: number; store?: EventStore; webDist?: string } = {}): Promise<TestServer> {
+export async function startServer(opts: { tickHz?: number; store?: EventStore; webDist?: string; env?: Record<string, string> } = {}): Promise<TestServer> {
   const config = loadConfig(
-    { ...process.env, LOG_LEVEL: 'silent', TICK_HZ: String(opts.tickHz ?? 50), DATABASE_URL: '' },
+    { ...process.env, LOG_LEVEL: 'silent', TICK_HZ: String(opts.tickHz ?? 50), DATABASE_URL: '', ADMIN_KEY: '', ...opts.env },
     { webDist: opts.webDist ?? '/nonexistent-web-dist' },
   );
   const ctx = await buildApp(config, opts.store);

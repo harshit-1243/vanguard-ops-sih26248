@@ -114,7 +114,7 @@
     { "id": "b-nlo", "side": "BLUE", "callsign": "TRIDENT", "type": "HQ", "count": 1, "strength": 10, "ownerRole": "NLO", "waypoints": [{ "atS": 0, "cell": "C2" }] },
     {
       "id": "r-armour-1", "side": "RED", "callsign": "HOSTILE ARMOUR COY", "type": "ARMOUR", "count": 6, "strength": 150, "behaviour": "reserve",
-      "waypoints": [{ "atS": 0, "cell": "G8" }, { "atS": 300, "cell": "G7" }, { "atS": 720, "cell": "F6" }, { "atS": 1080, "cell": "E6" }]
+      "waypoints": [{ "atS": 0, "cell": "E8" }, { "atS": 300, "cell": "F7" }, { "atS": 720, "cell": "F6" }, { "atS": 1080, "cell": "E6" }]
     },
     { "id": "r-decoy-1", "side": "RED", "callsign": "DECOY PARK D6", "type": "ARMOUR", "count": 5, "strength": 0, "decoy": true, "waypoints": [{ "atS": 0, "cell": "D6" }] },
     { "id": "r-inf-1", "side": "RED", "callsign": "BRIDGE GUARD", "type": "INFANTRY", "count": 3, "strength": 60, "behaviour": "defend", "waypoints": [{ "atS": 0, "cell": "E6" }] },

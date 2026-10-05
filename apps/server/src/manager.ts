@@ -19,7 +19,7 @@ export class SessionManager {
     for (const s of this.sessions.values()) s.onChange = fn;
   }
 
-  async create(scenarioId: string, seed?: number, enabledRoles?: RoleId[], settings?: SessionSettings) {
+  async create(scenarioId: string, seed?: number, enabledRoles?: RoleId[], settings?: SessionSettings, course = '') {
     const scenario = this.scenarios.get(scenarioId);
     if (!scenario) throw new NotFound(`Unknown scenario ${scenarioId}`);
     let code = newSessionCode();
@@ -34,6 +34,7 @@ export class SessionManager {
       enabledRoles,
       this.opts,
       settings,
+      course,
     );
     this.sessions.set(code, created.session);
     return created;

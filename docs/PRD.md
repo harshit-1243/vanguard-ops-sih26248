@@ -458,3 +458,18 @@ Changes requested after hands-on testing of the deployed build; each is logged i
 **A7. Scale (measured).** One Node process ran 40 concurrent exercises (210 connected sockets) at ×4 for 45 s: sim clock at 96 % of real time, RSS 170 MB, event-loop p99 42 ms (`pnpm --filter @vanguard/server loadtest`). A full DSSC course (~70 syndicates) at ×1 fits on one server; no horizontal scaling planned.
 
 **Assessed, not in scope:** voice push-to-talk (high effort and risk, low marginal value over degraded text nets); full scenario editor and cross-course analytics (JSON scenarios + exercise variables cover SIH needs).
+
+## Addendum v1.2 (2026-10-05) — scenario editor and cross-course analytics
+
+**A8. Scenario editor (D-021, US-DS-11).** G a course director, W they duplicate a template or import JSON
+and edit map/terrain, forces (incl. enemy behaviour and routes), roles + PACE, intent + objectives,
+MSEL and sensors, T *Validate* shows schema errors with paths, design warnings and a full-length dry run
+(MSEL fired, enemy reactions, strength left); *Save* is refused while errors remain; the scenario then
+appears in *Create exercise*. Built-ins are read-only; exercises keep their own snapshot.
+
+**A9. Cross-course analytics (D-022, US-DS-12).** G finished exercises, W the course director opens
+Analytics, T they see KPIs, a trend across exercises, tables by role / course / scenario / difficulty /
+officer, the most common reasons decisions were risky or unsound, deterministic findings (optional AI
+summary, labelled) and a CSV export (one row per exercise × role). Filters: course, scenario.
+
+**A10. Access.** Editor and analytics require `ADMIN_KEY` when set (rate-limited; 401/429).

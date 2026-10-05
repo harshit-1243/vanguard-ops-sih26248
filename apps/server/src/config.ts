@@ -26,7 +26,10 @@ const EnvSchema = z.object({
     .transform((v) => v === 'true' || v === '1'),
   SCENARIOS_DIR: z.string().optional(),
   WEB_DIST: z.string().optional(),
-  LLM_PROVIDER: z.enum(['none', 'ollama', 'anthropic', 'groq', 'cerebras', 'xai', 'openai']).default('none'),
+  LLM_PROVIDER: z.preprocess(
+    (v) => (typeof v === 'string' ? v.toLowerCase() : v),
+    z.enum(['none', 'ollama', 'anthropic', 'groq', 'cerebras', 'xai', 'openai']).default('none'),
+  ),
   /** OpenAI-compatible providers (groq | cerebras | xai | openai). Provider-specific key vars also work. */
   LLM_API_KEY: z.string().optional(),
   LLM_BASE_URL: z.string().optional(),
@@ -37,6 +40,8 @@ const EnvSchema = z.object({
   OLLAMA_URL: z.string().default('http://localhost:11434'),
   OLLAMA_MODEL: z.string().default('llama3.2'),
   ANTHROPIC_API_KEY: z.string().optional(),
+  /** Course-director key for the scenario editor + analytics (unset = open; closed LAN only). */
+  ADMIN_KEY: z.string().min(8).optional(),
   ANTHROPIC_MODEL: z.string().default('claude-opus-5-5'),
 });
 
@@ -46,7 +51,13 @@ export function loadConfig(
   env: NodeJS.ProcessEnv = process.env,
   overrides: Partial<Config> = {},
 ): Config {
-  const parsed = EnvSchema.parse(env);
+  // Dashboard-pasted values often carry whitespace; blank means unset.
+  const cleaned = Object.fromEntries(
+    Object.entries(env)
+      .map(([k, v]) => [k, typeof v === 'string' ? v.trim() : v] as const)
+      .filter(([, v]) => v !== ''),
+  );
+  const parsed = EnvSchema.parse(cleaned);
   const scenariosDir =
     overrides.scenariosDir ??
     (parsed.SCENARIOS_DIR ? path.resolve(parsed.SCENARIOS_DIR) : undefined) ??

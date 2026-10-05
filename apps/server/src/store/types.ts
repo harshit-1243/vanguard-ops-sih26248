@@ -12,6 +12,8 @@ export interface SessionRecord {
   instructorTokenHashes: string[];
   enabledRoles: RoleId[];
   scenario: unknown;
+  /** Course / syndicate label for analytics ("" = none). */
+  course: string;
   createdAt: Date;
   endedAt: Date | null;
 }
@@ -21,6 +23,13 @@ export interface PlayerRecord {
   roleId: RoleId;
   callsign: string;
   tokenHash: string;
+}
+
+export interface CustomScenarioRecord {
+  id: string;
+  title: string;
+  scenario: unknown;
+  updatedAt: Date;
 }
 
 export type SessionPatch = Partial<Pick<SessionRecord, 'status' | 'endedAt' | 'instructorTokenHashes'>>;
@@ -34,6 +43,10 @@ export interface EventStore {
   findSessionByCode(code: string): Promise<SessionRecord | null>;
   listOpenSessions(): Promise<SessionRecord[]>;
   countSessions(): Promise<number>;
+  listEndedSessions(): Promise<SessionRecord[]>;
+  listCustomScenarios(): Promise<CustomScenarioRecord[]>;
+  saveCustomScenario(rec: Omit<CustomScenarioRecord, 'updatedAt'>): Promise<CustomScenarioRecord>;
+  deleteCustomScenario(id: string): Promise<boolean>;
   appendEvent(e: StoredEvent): Promise<void>;
   loadEvents(sessionId: string): Promise<StoredEvent[]>;
   upsertPlayer(p: PlayerRecord): Promise<void>;

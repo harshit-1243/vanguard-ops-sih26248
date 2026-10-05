@@ -31,6 +31,8 @@ Contemporary conflicts have shown that electronic warfare and cyber disruption d
 | **Hindsight-safe AAR** | Decision cards freeze what was knowable (intel, ages, conflicts, outages) and reveal ground truth only on demand. Four AAR questions, swimlane timeline, network graph, replay scrubber, **PDF / JSON / CSV** export. |
 | **Live map + 3D / VR sand table** | MapLibre map (pan/zoom/tilt, extruded terrain, units gliding between ticks, sector popups) and a Three.js sand table with **Enter VR / Enter AR** on WebXR devices — same role-scoped data. |
 | **Adaptive enemy** | Deterministic OPFOR rules: reserves counter-attack threatened objectives, defenders fall back, artillery shoots-and-scoots when spotted, recce probes. |
+| **Scenario editor** | Course directors build scenarios in the browser — paint terrain, place forces and enemy routes, roles and PACE, intent, MSEL, sensors — with validation and a full-length dry run before saving. |
+| **Cross-course analytics** | Every finished exercise compared by course, scenario, role, difficulty and officer: trends, common mistakes, findings, CSV export. |
 | **Exercise variables** | DS sets EW intensity, sensor reliability, comms quality, OPFOR mode and which scripted injects run. |
 | **AI (Smart Automation)** | **AI inject advisor** for the DS (next friction tied to a training objective, one-click apply), AAR narrative and per-decision coaching, contradictory report drafts. Providers: `none` (default) · **Groq / Cerebras (free tiers)** · xAI · any OpenAI-compatible · Ollama (offline) · Anthropic. Everything works without AI. |
 
@@ -54,6 +56,7 @@ Full traceability, acceptance criteria and formulas: [`docs/PRD.md`](docs/PRD.md
 | ![Probe](docs/screenshots/10-sagat-probe.png) SAGAT freeze — picture blanked, answer from memory | ![Decision feed](docs/screenshots/08-ds-decision-feed.png) Live decision feed: knowable vs truth |
 | ![AAR summary](docs/screenshots/11-aar-summary.png) AAR executive summary | ![AAR card](docs/screenshots/14-aar-decision-card.png) Hindsight-safe decision card, truth revealed |
 | ![Timeline](docs/screenshots/12-aar-timeline.png) Swimlane timeline + replay | ![Metrics](docs/screenshots/13-aar-metrics-network.png) Metrics, SA heatmaps, comms network |
+| ![Editor](docs/screenshots/17-scenario-editor.png) Scenario editor: map painter, enemy route, validation + dry run | ![Analytics](docs/screenshots/18-cross-course-analytics.png) Cross-course analytics |
 | ![3D DS](docs/screenshots/15-ds-3d-sand-table.png) DS 3D sand table (truth, jammer dome, link arcs) — Enter VR/AR on WebXR devices | ![3D trainee](docs/screenshots/16-trainee-3d-sand-table.png) Trainee 3D view — only their perceived picture |
 
 ## Architecture
@@ -134,7 +137,7 @@ docker compose exec app node server/dist/seed-demo.js
 
 ### Configuration
 
-See [`.env.example`](.env.example): `PORT`, `TICK_HZ`, `DATABASE_URL`, `SEED_DEMO_ON_EMPTY`, `LLM_PROVIDER` (`none`|`groq`|`cerebras`|`xai`|`openai`|`ollama`|`anthropic`), `GROQ_API_KEY`, `CEREBRAS_API_KEY`, `XAI_API_KEY`, `LLM_MODEL` / `LLM_BASE_URL` / `LLM_API_KEY` overrides, `OLLAMA_URL`, `OLLAMA_MODEL`, `ANTHROPIC_API_KEY`, `ANTHROPIC_MODEL`.
+See [`.env.example`](.env.example): `PORT`, `TICK_HZ`, `DATABASE_URL`, `SEED_DEMO_ON_EMPTY`, `ADMIN_KEY` (course-director key for the scenario editor + analytics; Render generates one — see the service's Environment tab), `LLM_PROVIDER` (`none`|`groq`|`cerebras`|`xai`|`openai`|`ollama`|`anthropic`), `GROQ_API_KEY`, `CEREBRAS_API_KEY`, `XAI_API_KEY`, `LLM_MODEL` / `LLM_BASE_URL` / `LLM_API_KEY` overrides, `OLLAMA_URL`, `OLLAMA_MODEL`, `ANTHROPIC_API_KEY`, `ANTHROPIC_MODEL`.
 
 **Scale (measured):** one Node process ran 40 concurrent exercises (210 sockets) at ×4 — sim clock 96 % of real time, 170 MB RAM, event-loop p99 42 ms (`pnpm --filter @vanguard/server loadtest <url> <sessions> <seconds>`).
 

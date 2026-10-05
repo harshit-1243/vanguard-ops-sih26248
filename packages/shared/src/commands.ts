@@ -75,6 +75,7 @@ export const CreateSessionBodySchema = z.object({
   seed: z.number().int().min(0).max(2 ** 31 - 1).optional(),
   enabledRoles: z.array(RoleIdSchema).min(2).max(6).optional(),
   settings: SessionSettingsSchema.optional(),
+  course: z.string().trim().max(60).optional(),
 });
 export type CreateSessionBody = z.infer<typeof CreateSessionBodySchema>;
 

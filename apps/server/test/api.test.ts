@@ -118,7 +118,7 @@ describe('scenario loading', () => {
 describe('memory store', () => {
   it('rejects duplicate codes and seqs', async () => {
     const st = new MemoryEventStore();
-    const rec = { id: 'a', code: 'ABCDEF', scenarioId: 's', seed: 1, status: 'LOBBY' as const, pinHash: 'x', instructorTokenHashes: [], enabledRoles: [], scenario: {}, createdAt: new Date(), endedAt: null };
+    const rec = { id: 'a', code: 'ABCDEF', scenarioId: 's', seed: 1, status: 'LOBBY' as const, pinHash: 'x', instructorTokenHashes: [], enabledRoles: [], scenario: {}, course: '', createdAt: new Date(), endedAt: null };
     await st.createSession(rec);
     await expect(st.createSession({ ...rec, id: 'b' })).rejects.toThrow(/duplicate code/);
     const ev = { id: 'e', sessionId: 'a', seq: 1, tSimMs: 0, tWall: new Date().toISOString(), actor: 'DS', type: 'EXERCISE_STARTED', payload: {} } as const;

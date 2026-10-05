@@ -3,7 +3,7 @@ import type {
   JoinResponse,
   LobbyInfo,
   RoleId,
-  ScenarioSummary,
+  ScenarioListItem,
   SessionSettings,
 } from '@vanguard/shared';
 
@@ -47,9 +47,9 @@ export interface Briefing {
 
 export const api = {
   demo: () => request<CreateSessionResponse>('POST', '/api/demo', {}),
-  scenarios: () => request<ScenarioSummary[]>('GET', '/api/scenarios'),
-  create: (scenarioId: string, enabledRoles?: RoleId[], seed?: number, settings?: SessionSettings) =>
-    request<CreateSessionResponse>('POST', '/api/sessions', { scenarioId, enabledRoles, seed, settings }),
+  scenarios: () => request<ScenarioListItem[]>('GET', '/api/scenarios'),
+  create: (scenarioId: string, enabledRoles?: RoleId[], seed?: number, settings?: SessionSettings, course?: string) =>
+    request<CreateSessionResponse>('POST', '/api/sessions', { scenarioId, enabledRoles, seed, settings, course: course?.trim() || undefined }),
   instructorLogin: (code: string, pin: string) =>
     request<{ instructorToken: string }>('POST', `/api/sessions/${code}/instructor`, { pin }),
   lobby: (code: string) => request<LobbyInfo>('GET', `/api/sessions/${code}/lobby`),

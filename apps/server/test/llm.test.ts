@@ -116,7 +116,7 @@ describe('AI endpoints', () => {
   it('status + DS-only report variants; drafted texts flow into a CONFLICT inject', async () => {
     const srv = await startServer();
     try {
-      expect((await srv.api('GET', '/api/ai/status')).body).toEqual({ provider: 'none', enabled: false });
+      expect((await srv.api('GET', '/api/ai/status')).body).toMatchObject({ provider: 'none', enabled: false, ready: true });
       const { code, instructorToken } = await createSession(srv);
       expect((await srv.api('POST', `/api/sessions/${code}/ai/report-variants`, { cell: 'D6' })).status).toBe(401);
       const r = await srv.api<{ contradictory: [string, string] }>('POST', `/api/sessions/${code}/ai/report-variants`, { cell: 'D6' }, instructorToken);

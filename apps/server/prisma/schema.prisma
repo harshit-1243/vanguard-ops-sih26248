@@ -21,10 +21,13 @@ model Session {
   instructorTokenHashes String[]
   enabledRoles          String[]
   scenario              Json
+  course                String    @default("")
   createdAt             DateTime  @default(now())
   endedAt               DateTime?
   events                Event[]
   players               Player[]
+
+  @@index([status])
 }
 
 model Player {
@@ -52,4 +55,13 @@ model Event {
 
   @@unique([sessionId, seq])
   @@index([sessionId])
+}
+
+/// Scenarios authored in the DS scenario editor (built-in templates stay in /scenarios).
+model CustomScenario {
+  id        String   @id
+  title     String
+  scenario  Json
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }

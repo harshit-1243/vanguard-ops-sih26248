@@ -86,3 +86,17 @@ logged every 30 sim-seconds so a restarted server resumes within 30 s of where i
 
 **D-020 · 2026-10-05 · Exercise variables at creation.** EW intensity, sensor reliability, comms
 quality, OPFOR mode and per-item MSEL toggles are stored in `SESSION_CREATED.settings` (replay-safe).
+
+**D-021 · 2026-10-05 · Scenario editor (supersedes "JSON files only").** Course directors author
+scenarios in the browser (map painter, forces, roles/intent, MSEL, sensors, raw JSON). Every save
+is Zod-validated, checked for design problems (land units at sea, MSEL after the end, …) and
+dry-run headlessly for the full duration. Built-ins stay read-only in `/scenarios`; custom ones
+live in the `CustomScenario` table. Sessions already snapshot their scenario, so edits never
+change a past exercise or its replay. The validator found a data bug in Iron Bridge (armour
+starting on sea cells G8/G7) — moved to E8/F7.
+
+**D-022 · 2026-10-05 · Cross-course analytics by replay, behind ADMIN_KEY.** Analytics replay each
+ENDED exercise once, reduce it to the AAR metrics and cache the result (ended logs are immutable),
+so every number traces back to an AAR. Exercises carry a free-text course/syndicate label.
+The course-director area (editor + analytics) needs `ADMIN_KEY` as a bearer token; without it the
+area is open (closed LAN only) and the UI says so. The Render Blueprint generates the key.

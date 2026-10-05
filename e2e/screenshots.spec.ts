@@ -106,4 +106,19 @@ test('capture README screenshots', async ({ browser, request }) => {
   await card.scrollIntoViewIfNeeded();
   await card.evaluate((el) => el.scrollIntoView({ block: 'start' }));
   await shot(aar, '14-aar-decision-card');
+  // Course director: scenario editor + cross-course analytics
+  const cd = await page(browser);
+  await cd.goto('/');
+  await cd.evaluate(() => sessionStorage.setItem('vg-admin-key', 'e2e-course-director-key'));
+  await cd.goto('/scenarios/new?from=iron-bridge');
+  await cd.getByRole('tab', { name: 'Map' }).click();
+  await cd.getByRole('button', { name: 'Unit route' }).click();
+  await cd.getByLabel('Unit', { exact: true }).selectOption({ index: 7 });
+  await cd.getByRole('button', { name: 'Validate + dry run' }).click();
+  await expect(cd.getByText('Valid — ready to save')).toBeVisible({ timeout: 20_000 });
+  await shot(cd, '17-scenario-editor');
+  await request.post('/api/demo', { data: {} });
+  await cd.goto('/analytics');
+  await expect(cd.getByRole('heading', { name: 'By role' })).toBeVisible({ timeout: 30_000 });
+  await shot(cd, '18-cross-course-analytics');
 });

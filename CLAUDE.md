@@ -53,3 +53,5 @@ docker compose up      # full offline stack (app + postgres [+ ollama profile])
 - UI: restrained tactical palette (tokens in `apps/web/src/index.css`), monospace for data,
   colour never the only signal (always pair with text/icon/pattern).
 - Never commit `.env`; update `.env.example` when adding config.
+- Course-director area (`/scenarios`, `/analytics`, `/api/admin/*`) is guarded by `ADMIN_KEY`; built-in
+  scenarios stay read-only, custom ones live in the store (`CustomScenario`).
