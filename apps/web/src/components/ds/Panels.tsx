@@ -112,7 +112,7 @@ export function DecisionFeed({ t }: { t: InstructorState }) {
 
 export function Heatmap({ roles, matrix, label }: { roles: string[]; matrix: (number | null)[][]; label: string }) {
   if (roles.length < 2) return <Empty>Needs answers from at least two roles.</Empty>;
-  const color = (v: number | null) => (v === null ? 'transparent' : `color-mix(in srgb, var(--color-bad) ${Math.round(v * 85)}%, var(--color-panel2))`);
+  const color = (v: number | null) => (v === null ? 'transparent' : `color-mix(in srgb, var(--color-bad) ${Math.round(v * 55)}%, var(--color-panel2))`);
   return (
     <table className="mx-3 my-2 border-separate border-spacing-0.5 font-mono text-[10px]" aria-label={label}>
       <thead>

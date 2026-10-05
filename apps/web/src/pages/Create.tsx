@@ -125,7 +125,7 @@ export default function Create() {
                     const on = roles.includes(r.id);
                     const locked = r.id === 'CDR';
                     return (
-                      <label key={r.id} className={cn('flex cursor-pointer items-start gap-3 rounded-md border p-3', on ? 'border-line bg-panel2' : 'border-line/60 opacity-70')}>
+                      <label key={r.id} className={cn('flex cursor-pointer items-start gap-3 rounded-md border p-3', on ? 'border-line bg-panel2' : 'border-dashed border-line')}>
                         <input
                           type="checkbox"
                           className="mt-1 accent-[var(--color-accent)]"

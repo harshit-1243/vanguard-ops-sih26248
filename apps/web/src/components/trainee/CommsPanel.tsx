@@ -129,8 +129,8 @@ export function CommsPanel({ p, cmd, readOnly }: { p: PerceivedPicture; cmd: Cmd
       )}
 
       <SectionTitle className="border-t">Traffic</SectionTitle>
+      {log.length === 0 && <Empty>No traffic yet.</Empty>}
       <ol className="min-h-0 flex-1 overflow-y-auto" aria-label="Message log">
-        {log.length === 0 && <Empty>No traffic yet.</Empty>}
         {log.map((e) =>
           e.dir === 'in' ? (
             <li key={e.key} className="border-b border-line/60 px-3 py-1.5">

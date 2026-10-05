@@ -51,8 +51,14 @@
 - AI layer (`apps/server/src/llm.ts`): provider abstraction none | ollama | anthropic (official SDK, claude-opus-5-5, low effort, server-side refusal fallbacks). AAR narrative + per-decision coaching drafts (≤12, concurrency 3), report variants (SALUTE / contact / SITREP + contradictory pair) at `POST /api/sessions/:code/ai/report-variants`; DS composer "Draft texts" for CONFLICT injects (texts recorded in the event log). Template fallback on any failure; all AI output labelled.
 - Tests: 8 AI tests with fake/mocked providers (no network). Real Anthropic/Ollama calls were **not** exercised (no key / no Ollama locally) — adapters verified against mocked transports only.
 
+## Phase 8 — Quality ✅ (2026-10-05)
+- Playwright (`e2e/iron-bridge.spec.ts`) against the production build: DS + 3 trainees in **separate browser contexts**; create → join → start ×4 → CDR→PL A message over CMD_NET (arrives, sometimes garbled by design) → DS places a jammer with the map tool → PL B sees CUT OFF and commits a decision (map-picked target) → DS feed shows it flagged "cut off" → ≥ 3 sim-minutes → SAGAT freeze, all three answer, DS scores & resumes → end → AAR (hindsight-safe card reveal) → **PDF downloads and contains decision cards** (pdf-parse) → trainee opens AAR. Passed twice in a row (~1 min).
+- axe-core (`e2e/a11y.spec.ts`): no serious/critical WCAG 2.1 AA violations on landing, create, join, trainee lobby + console, DS console, AAR. Fixed along the way: faint text token contrast, faded role cards, invalid list children, danger-button ink, heatmap fill.
+- Lighthouse accessibility: 100 on landing, create, join (run against the prod build via a debug-port Chromium).
+- Map clicks now resolve from SVG coordinates (clicking a sector under a marker or link line selects it).
+
 ## Pending
-- Phase 8 E2E + a11y → Phase 12 handover.
+- Phase 9 packaging → Phase 12 handover.
 
 ## Known issues
 - None yet.

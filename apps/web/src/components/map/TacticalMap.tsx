@@ -1,4 +1,4 @@
-import { useMemo, useState, type KeyboardEvent } from 'react';
+import { useMemo, useState, type KeyboardEvent, type MouseEvent } from 'react';
 import { COL_LETTERS, TERRAIN_CODES, cellCentre, cellFromIndex, type TerrainCode } from '@vanguard/shared';
 import { cn } from '@/lib/utils';
 
@@ -203,8 +203,23 @@ export function TacticalMap(props: TacticalMapProps) {
     }
   };
 
+  /** Any click inside the grid selects that sector, even on top of a marker, link or label. */
+  const onSvgClick = (e: MouseEvent<SVGSVGElement>) => {
+    if (!onCellClick) return;
+    const svg = e.currentTarget;
+    const ctm = svg.getScreenCTM();
+    if (!ctm) return;
+    const pt = new DOMPoint(e.clientX, e.clientY).matrixTransform(ctm.inverse());
+    const col = Math.floor(pt.x / CELL);
+    const row = Math.floor(pt.y / CELL);
+    if (col < 0 || col > 7 || row < 0 || row > 7) return;
+    setFocus({ col, row });
+    onCellClick(cellFromIndex(col, row));
+  };
+
   return (
     <svg
+      onClick={onSvgClick}
       viewBox={`${-PAD} ${-PAD} ${8 * CELL + PAD + 4} ${8 * CELL + PAD + 4}`}
       className={cn('h-full w-full select-none', pickMode && 'cursor-crosshair', props.className)}
       role="group"
@@ -225,10 +240,6 @@ export function TacticalMap(props: TacticalMapProps) {
               role={onCellClick ? 'button' : undefined}
               tabIndex={onCellClick ? (isFocus ? 0 : -1) : undefined}
               aria-label={`${cell} ${name.toLowerCase()}${selectedCell === cell ? ', selected' : ''}`}
-              onClick={() => {
-                setFocus({ col: c, row: r });
-                onCellClick?.(cell);
-              }}
               onKeyDown={onCellClick ? onKey : undefined}
               onFocus={() => setFocus({ col: c, row: r })}
               className={cn('outline-none', onCellClick && 'cursor-pointer [&:focus-visible>rect.focusring]:stroke-[var(--color-accent)]')}

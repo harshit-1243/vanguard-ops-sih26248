@@ -18,7 +18,7 @@
   --color-line: #2b3743;
   --color-ink: #dce3ea;
   --color-muted: #93a1af;
-  --color-faint: #6a7784;
+  --color-faint: #7f8c99;
 
   --color-accent: #e5a940;
   --color-accent-ink: #1a1306;
@@ -28,6 +28,7 @@
   --color-ok: #52b984;
   --color-warn: #e0a83c;
   --color-bad: #e5675a;
+  --color-bad-ink: #f4a198;
 
   --color-t-open: #1b242d;
   --color-t-forest: #1c3026;

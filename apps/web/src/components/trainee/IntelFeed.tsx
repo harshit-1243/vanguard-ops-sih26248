@@ -88,8 +88,8 @@ export function IntelFeed({
           </button>
         ))}
       </div>
+      {items.length === 0 && <Empty>No intel received on this filter yet.</Empty>}
       <ol className="min-h-0 flex-1 overflow-y-auto" aria-label="Intel feed (newest first)">
-        {items.length === 0 && <Empty>No intel received on this filter yet.</Empty>}
         {items.map((i) => {
           const age = p.tMs - i.observedAtMs;
           const cf = conflictsOf.get(i.id) ?? [];

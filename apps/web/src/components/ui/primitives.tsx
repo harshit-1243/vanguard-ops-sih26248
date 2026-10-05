@@ -8,7 +8,7 @@ const variantCls: Record<ButtonVariant, string> = {
   primary: 'bg-accent text-accent-ink hover:brightness-110 font-semibold',
   default: 'bg-raised text-ink hover:bg-line border border-line',
   ghost: 'text-muted hover:text-ink hover:bg-raised',
-  danger: 'bg-bad/15 text-bad border border-bad/50 hover:bg-bad/25',
+  danger: 'bg-bad/15 text-bad-ink border border-bad/50 hover:bg-bad/25',
   outline: 'border border-line text-ink hover:border-muted',
 };
 const sizeCls: Record<ButtonSize, string> = {
