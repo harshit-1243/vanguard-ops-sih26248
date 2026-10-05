@@ -28,6 +28,16 @@ const MAX_RETRIES = 2;
 const MAX_RETRY_WAIT_MS = 15_000;
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
+/** Models often answer in Markdown despite "plain text": strip emphasis and heading marks. */
+export function plainText(s: string): string {
+  return s
+    .replace(/\*\*(.+?)\*\*/g, '$1')
+    .replace(/__(.+?)__/g, '$1')
+    .replace(/^#{1,6}\s+/gm, '')
+    .replace(/[ \t]+$/gm, '')
+    .trim();
+}
+
 const TIMEOUT_MS = 30_000;
 
 /** Claude via the official SDK (low effort: short drafting tasks). */
@@ -61,7 +71,7 @@ export class AnthropicProvider implements LlmProvider {
       .join('\n')
       .trim();
     if (!text) throw new Error('Empty response');
-    return text;
+    return plainText(text);
   }
 }
 
@@ -86,7 +96,7 @@ export class OllamaProvider implements LlmProvider {
     const data = (await res.json()) as { response?: string };
     const text = (data.response ?? '').trim();
     if (!text) throw new Error('Empty response');
-    return text;
+    return plainText(text);
   }
 }
 
@@ -146,7 +156,7 @@ export class OpenAiCompatibleProvider implements LlmProvider {
       const data = (await res.json()) as { choices?: { message?: { content?: string } }[] };
       const text = (data.choices?.[0]?.message?.content ?? '').trim();
       if (!text) throw new Error('Empty response');
-      return text;
+      return plainText(text);
     }
   }
 }

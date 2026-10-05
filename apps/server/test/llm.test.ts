@@ -220,3 +220,10 @@ describe('AI inject advisor', () => {
     expect(bad.suggestions.length).toBeGreaterThan(0);
   });
 });
+
+describe('plainText', () => {
+  it('strips Markdown emphasis and headings that models add despite instructions', async () => {
+    const { plainText } = await import('../src/llm');
+    expect(plainText('## 1. What happened?\n**KESTREL** held __E5__.  \n- kept bullets')).toBe('1. What happened?\nKESTREL held E5.\n- kept bullets');
+  });
+});
