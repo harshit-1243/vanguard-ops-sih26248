@@ -10,7 +10,12 @@ import {
   type Scenario,
   type StoredEvent,
   type TraineeCommand,
+  type SessionSettings,
+  DEFAULT_SETTINGS,
 } from '@vanguard/shared';
+
+/** Sim-time interval between persisted clock checkpoints (bounds time lost on a restart). */
+export const CHECKPOINT_MS = 30_000;
 import { project, projectTruth, replay, SimRejection, Simulation } from '@vanguard/sim';
 import { hashSecret, newPin, newToken, sameHash } from './auth';
 import type { EventStore, SessionRecord } from './store/types';
@@ -69,8 +74,9 @@ export class LiveSession {
     seed: number,
     enabledRoles: RoleId[] | undefined,
     opts: SessionOptions,
+    settings: SessionSettings = DEFAULT_SETTINGS,
   ): Promise<{ session: LiveSession; pin: string; instructorToken: string }> {
-    const sim = new Simulation(scenario, seed, enabledRoles);
+    const sim = new Simulation(scenario, seed, enabledRoles, settings);
     const pin = newPin();
     const instructorToken = newToken();
     const record: SessionRecord = {
@@ -90,7 +96,7 @@ export class LiveSession {
     const session = new LiveSession(record, scenario, sim, store, opts);
     session.emit('SYSTEM', {
       type: 'SESSION_CREATED',
-      payload: { scenarioId: scenario.id, seed, enabledRoles: record.enabledRoles },
+      payload: { scenarioId: scenario.id, seed, enabledRoles: record.enabledRoles, settings },
     });
     await session.flush();
     return { session, pin, instructorToken };
@@ -102,6 +108,7 @@ export class LiveSession {
     const sim = replay(scenario, events);
     const session = new LiveSession(record, scenario, sim, store, opts);
     session.events.push(...events);
+    session.lastCheckpointMs = sim.state.tMs;
     for (const p of await store.loadPlayers(record.id)) {
       session.players.set(p.roleId, { callsign: p.callsign, tokenHash: p.tokenHash });
     }
@@ -283,12 +290,18 @@ export class LiveSession {
   }
 
   // ------------------------------------------------------------ clock
-  /** One fixed sim step (1000 ms) + broadcast. */
+  /** One fixed sim step (1000 ms) + broadcast; a clock checkpoint is logged every 30 sim-seconds. */
   tick(): void {
     if (this.phase !== 'RUNNING') return;
     this.sim.step();
+    if (this.sim.state.tMs - this.lastCheckpointMs >= CHECKPOINT_MS) {
+      this.lastCheckpointMs = this.sim.state.tMs;
+      this.emit('SYSTEM', { type: 'CLOCK_CHECKPOINT', payload: {} });
+    }
     this.onChange(this);
   }
+
+  private lastCheckpointMs = 0;
 
   /** Run n steps synchronously (tests / demo seeding). */
   advance(steps: number): void {

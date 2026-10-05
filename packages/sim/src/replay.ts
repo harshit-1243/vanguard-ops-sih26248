@@ -1,4 +1,4 @@
-import type { RoleId, Scenario, SimEvent } from '@vanguard/shared';
+import { SessionSettingsSchema, type RoleId, type Scenario, type SessionSettings, type SimEvent } from '@vanguard/shared';
 import { Simulation } from './simulation';
 
 export interface ReplayOptions {
@@ -9,10 +9,10 @@ export interface ReplayOptions {
 }
 
 /** Seed + enabled roles from the SESSION_CREATED event (must be first). */
-export function sessionParams(events: readonly SimEvent[]): { seed: number; enabledRoles: RoleId[] } {
+export function sessionParams(events: readonly SimEvent[]): { seed: number; enabledRoles: RoleId[]; settings: SessionSettings } {
   const first = [...events].sort((a, b) => a.seq - b.seq)[0];
   if (!first || first.type !== 'SESSION_CREATED') throw new Error('Log must start with SESSION_CREATED');
-  return { seed: first.payload.seed, enabledRoles: first.payload.enabledRoles };
+  return { seed: first.payload.seed, enabledRoles: first.payload.enabledRoles, settings: SessionSettingsSchema.parse(first.payload.settings) };
 }
 
 /**
@@ -21,8 +21,8 @@ export function sessionParams(events: readonly SimEvent[]): { seed: number; enab
  */
 export function replay(scenario: Scenario, events: readonly SimEvent[], opts: ReplayOptions = {}): Simulation {
   const ordered = [...events].sort((a, b) => a.seq - b.seq);
-  const { seed, enabledRoles } = sessionParams(ordered);
-  const sim = new Simulation(scenario, seed, enabledRoles);
+  const { seed, enabledRoles, settings } = sessionParams(ordered);
+  const sim = new Simulation(scenario, seed, enabledRoles, settings);
   for (const e of ordered) {
     while (sim.state.tMs < e.tSimMs) {
       if (sim.state.phase !== 'RUNNING') {

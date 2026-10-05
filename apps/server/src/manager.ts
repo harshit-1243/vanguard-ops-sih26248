@@ -1,4 +1,4 @@
-import type { RoleId, Scenario } from '@vanguard/shared';
+import type { RoleId, Scenario, SessionSettings } from '@vanguard/shared';
 import { newSessionCode } from './auth';
 import type { ScenarioRegistry } from './scenarios';
 import { LiveSession, type SessionOptions } from './session';
@@ -19,7 +19,7 @@ export class SessionManager {
     for (const s of this.sessions.values()) s.onChange = fn;
   }
 
-  async create(scenarioId: string, seed?: number, enabledRoles?: RoleId[]) {
+  async create(scenarioId: string, seed?: number, enabledRoles?: RoleId[], settings?: SessionSettings) {
     const scenario = this.scenarios.get(scenarioId);
     if (!scenario) throw new NotFound(`Unknown scenario ${scenarioId}`);
     let code = newSessionCode();
@@ -33,6 +33,7 @@ export class SessionManager {
       seed ?? scenario.defaultSeed,
       enabledRoles,
       this.opts,
+      settings,
     );
     this.sessions.set(code, created.session);
     return created;

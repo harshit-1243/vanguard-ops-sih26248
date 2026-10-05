@@ -24,6 +24,8 @@ import {
   type UnitType,
   type Vec,
   CHANNEL_IDS,
+  DEFAULT_SETTINGS,
+  type SessionSettings,
 } from '@vanguard/shared';
 import { seedRng } from './rng';
 
@@ -50,6 +52,14 @@ export interface UnitState {
   /** Cell the owning trainee ordered the unit to (perceived intent; truth may differ under GPS spoof). */
   orderedCell: Cell | null;
   engage: { decisionId: string; atMs: number; cell: Cell; pos: Vec } | null;
+  /** OPFOR behaviour (scenario-defined) and reaction bookkeeping — truth only. */
+  behaviour: 'scripted' | 'reserve' | 'defend' | 'shoot-and-scoot' | 'probe';
+  committed: boolean;
+  lastSpottedMs: number;
+  lastMovedMs: number;
+  nextReactMs: number;
+  /** Counter-attack in progress (resolved on arrival). */
+  assault: { atMs: number; cell: Cell } | null;
 }
 
 export interface JammerState extends JammerSpec {
@@ -204,7 +214,8 @@ export type JournalKind =
   | 'PROBE'
   | 'INTENT'
   | 'FLAG'
-  | 'VERIFY';
+  | 'VERIFY'
+  | 'OPFOR';
 
 export interface JournalEntry {
   tMs: number;
@@ -265,6 +276,7 @@ export interface SimState {
 /** Immutable world context passed to every sim function. */
 export interface Ctx {
   sc: Scenario;
+  settings: SessionSettings;
   ch: Record<ChannelId, ChannelDef>;
   roleSpec: Partial<Record<RoleId, RoleSpec>>;
   sensorSpec: Record<string, SensorSpec>;
@@ -284,22 +296,38 @@ export const DEFAULT_SPEED: Partial<Record<UnitType, number>> = {
   SHIP: 0.6,
 };
 
-export function resolveChannels(sc: Scenario): Record<ChannelId, ChannelDef> {
+const r4 = (n: number) => Math.round(n * 10_000) / 10_000;
+
+/** Channel table = defaults → scenario overrides → session difficulty settings. */
+export function resolveChannels(sc: Scenario, settings: SessionSettings = DEFAULT_SETTINGS): Record<ChannelId, ChannelDef> {
   const out = {} as Record<ChannelId, ChannelDef>;
   for (const id of CHANNEL_IDS) {
     const base = DEFAULT_CHANNELS[id];
     const o = sc.channels[id] ?? {};
-    out[id] = { ...base, ...o, members: o.members ?? [...base.members] };
+    const ch: ChannelDef = { ...base, ...o, members: o.members ?? [...base.members] };
+    if (id !== 'RUNNER') {
+      if (!ch.messaging) {
+        if (settings.sensorReliability === 'high') Object.assign(ch, { baseDrop: r4(ch.baseDrop * 0.5), baseCorrupt: r4(ch.baseCorrupt * 0.5) });
+        if (settings.sensorReliability === 'low') Object.assign(ch, { baseDrop: r4(ch.baseDrop + 0.1), baseCorrupt: r4(ch.baseCorrupt + 0.08) });
+      } else {
+        if (settings.commsQuality === 'good') Object.assign(ch, { baseLatencyS: r4(ch.baseLatencyS * 0.7), baseDrop: r4(ch.baseDrop * 0.5) });
+        if (settings.commsQuality === 'poor') Object.assign(ch, { baseLatencyS: r4(ch.baseLatencyS * 1.5), baseDrop: r4(ch.baseDrop + 0.06), baseCorrupt: r4(ch.baseCorrupt + 0.04) });
+      }
+    }
+    out[id] = ch;
   }
   return out;
 }
 
-export function makeCtx(sc: Scenario, s: SimState): Ctx {
+/** Jammer effective-radius multiplier for the session's EW intensity. */
+export const EW_MULT: Record<SessionSettings['ewIntensity'], number> = { low: 0.75, normal: 1, high: 1.3 };
+
+export function makeCtx(sc: Scenario, s: SimState, settings: SessionSettings = DEFAULT_SETTINGS): Ctx {
   const roleSpec: Partial<Record<RoleId, RoleSpec>> = {};
   for (const r of sc.roles) roleSpec[r.id] = r;
   const sensorSpec: Record<string, SensorSpec> = {};
   for (const x of sc.sensors) sensorSpec[x.id] = x;
-  return { sc, ch: resolveChannels(sc), roleSpec, sensorSpec, s };
+  return { sc, settings, ch: resolveChannels(sc, settings), roleSpec, sensorSpec, s };
 }
 
 function waypointTrack(waypoints: { atS: number; cell: Cell }[]): Keyframe[] {
@@ -308,7 +336,12 @@ function waypointTrack(waypoints: { atS: number; cell: Cell }[]): Keyframe[] {
     .map((w) => ({ tMs: w.atS * 1000, ...cellCentre(w.cell) }));
 }
 
-export function createInitialState(sc: Scenario, seed: number, enabledRoles?: RoleId[]): SimState {
+export function createInitialState(
+  sc: Scenario,
+  seed: number,
+  enabledRoles?: RoleId[],
+  settings: SessionSettings = DEFAULT_SETTINGS,
+): SimState {
   const roleIds = sc.roles.map((r) => r.id);
   const enabled = (enabledRoles ?? sc.roles.filter((r) => !r.optional).map((r) => r.id))
     .filter((r) => roleIds.includes(r))
@@ -333,6 +366,12 @@ export function createInitialState(sc: Scenario, seed: number, enabledRoles?: Ro
       status: 'ACTIVE' as const,
       orderedCell: null,
       engage: null,
+      behaviour: u.behaviour,
+      committed: false,
+      lastSpottedMs: -1,
+      lastMovedMs: -1_000_000,
+      nextReactMs: 30_000,
+      assault: null,
     }))
     .sort((a, b) => (a.id < b.id ? -1 : 1));
 
@@ -398,7 +437,7 @@ export function createInitialState(sc: Scenario, seed: number, enabledRoles?: Ro
         atS: m.atS,
         title: m.title,
         action: m.action,
-        status: 'PENDING' as const,
+        status: (settings.disabledMsel.includes(m.id) ? 'SKIPPED' : 'PENDING') as 'PENDING' | 'SKIPPED',
         firedAtMs: null,
       }))
       .sort((a, b) => a.atS - b.atS || (a.id < b.id ? -1 : 1)),

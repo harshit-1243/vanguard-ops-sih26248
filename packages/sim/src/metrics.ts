@@ -197,6 +197,7 @@ const TIMELINE_KINDS: Record<string, TimelineEvent['kind']> = {
   STRIKE: 'STRIKE',
   FEATURE: 'FEATURE',
   PACE: 'PACE',
+  OPFOR: 'OPFOR',
 };
 
 /** Swimlane timeline (PRD US-AAR-4). One lane per role + an ALL lane for exercise-wide events. */

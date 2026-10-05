@@ -17,6 +17,7 @@ import {
   type Vec,
 } from '@vanguard/shared';
 import { injectApplies, sharedChannels } from './links';
+import { markSpotted } from './opfor';
 import { transmit } from './pipeline';
 import { chance, pick, randInt } from './rng';
 import { journal, nextId, type Ctx, type ReportMeta, type UnitState } from './state';
@@ -279,6 +280,7 @@ export function ownObservation(ctx: Ctx, role: RoleId): void {
     });
     item.deliveredAtMs = s.tMs;
     rs.intel.push(item);
+    markSpotted(ctx, o.unitIds);
     s.reportMeta[item.id] = {
       truthUnitIds: o.unitIds,
       spoofed: false,

@@ -102,7 +102,7 @@ export async function buildApp(
 
   app.post('/api/sessions', async (req, reply) => {
     const body = CreateSessionBodySchema.parse(req.body ?? {});
-    const created = await manager.create(body.scenarioId, body.seed, body.enabledRoles).catch((err: unknown) => {
+    const created = await manager.create(body.scenarioId, body.seed, body.enabledRoles, body.settings).catch((err: unknown) => {
       if (err instanceof NotFound) throw err;
       if (err instanceof Error && /CDR|two roles/.test(err.message)) throw Object.assign(err, { statusCode: 400 });
       throw err;

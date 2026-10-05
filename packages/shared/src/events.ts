@@ -8,6 +8,7 @@ import {
   IntentSelfSchema,
   JammerSpecSchema,
   RoleIdSchema,
+  SessionSettingsSchema,
   SpeedSchema,
 } from './domain';
 
@@ -56,6 +57,7 @@ export const InputEventBodySchema = z.discriminatedUnion('type', [
       scenarioId: z.string(),
       seed: z.number().int(),
       enabledRoles: z.array(RoleIdSchema),
+      settings: SessionSettingsSchema.optional(),
       scenario: z.unknown().optional(),
     }),
   ),
@@ -100,6 +102,8 @@ export const InputEventBodySchema = z.discriminatedUnion('type', [
     z.object({ probeId: z.string(), answers: z.record(z.string(), z.string().max(40)) }),
   ),
   ev('PROBE_ENDED', z.object({ probeId: z.string() })),
+  /** Periodic marker so a restarted server resumes at (almost) the same sim time. No state change. */
+  ev('CLOCK_CHECKPOINT', empty),
 ]);
 export type InputEventBody = z.infer<typeof InputEventBodySchema>;
 export type InputEventType = InputEventBody['type'];

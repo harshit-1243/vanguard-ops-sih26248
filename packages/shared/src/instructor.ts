@@ -92,6 +92,7 @@ export interface TruthUnitView {
   cell: Cell;
   status: 'ACTIVE' | 'DESTROYED' | 'WITHDRAWN';
   ownerRole: RoleId | null;
+  behaviour: string;
   destination: Cell | null;
 }
 
@@ -100,6 +101,7 @@ export interface TruthJammerView {
   label: string;
   cell: Cell;
   radius: number;
+  effectiveRadius: number;
   bands: Band[];
   power: number;
   active: boolean;

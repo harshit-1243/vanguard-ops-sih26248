@@ -113,13 +113,13 @@
     { "id": "b-ew", "side": "BLUE", "callsign": "SPECTRE", "type": "EW_DET", "count": 1, "strength": 20, "ownerRole": "EW", "waypoints": [{ "atS": 0, "cell": "D2" }] },
     { "id": "b-nlo", "side": "BLUE", "callsign": "TRIDENT", "type": "HQ", "count": 1, "strength": 10, "ownerRole": "NLO", "waypoints": [{ "atS": 0, "cell": "C2" }] },
     {
-      "id": "r-armour-1", "side": "RED", "callsign": "HOSTILE ARMOUR COY", "type": "ARMOUR", "count": 6, "strength": 150,
+      "id": "r-armour-1", "side": "RED", "callsign": "HOSTILE ARMOUR COY", "type": "ARMOUR", "count": 6, "strength": 150, "behaviour": "reserve",
       "waypoints": [{ "atS": 0, "cell": "G8" }, { "atS": 300, "cell": "G7" }, { "atS": 720, "cell": "F6" }, { "atS": 1080, "cell": "E6" }]
     },
     { "id": "r-decoy-1", "side": "RED", "callsign": "DECOY PARK D6", "type": "ARMOUR", "count": 5, "strength": 0, "decoy": true, "waypoints": [{ "atS": 0, "cell": "D6" }] },
-    { "id": "r-inf-1", "side": "RED", "callsign": "BRIDGE GUARD", "type": "INFANTRY", "count": 3, "strength": 60, "waypoints": [{ "atS": 0, "cell": "E6" }] },
-    { "id": "r-eng-1", "side": "RED", "callsign": "DEMOLITION PARTY", "type": "ENGINEER", "count": 2, "strength": 20, "waypoints": [{ "atS": 0, "cell": "E6" }] },
-    { "id": "r-recce-1", "side": "RED", "callsign": "HOSTILE RECCE", "type": "RECCE", "count": 2, "strength": 30, "waypoints": [{ "atS": 0, "cell": "B7" }, { "atS": 400, "cell": "C6" }] },
+    { "id": "r-inf-1", "side": "RED", "callsign": "BRIDGE GUARD", "type": "INFANTRY", "count": 3, "strength": 60, "behaviour": "defend", "waypoints": [{ "atS": 0, "cell": "E6" }] },
+    { "id": "r-eng-1", "side": "RED", "callsign": "DEMOLITION PARTY", "type": "ENGINEER", "count": 2, "strength": 20, "behaviour": "defend", "waypoints": [{ "atS": 0, "cell": "E6" }] },
+    { "id": "r-recce-1", "side": "RED", "callsign": "HOSTILE RECCE", "type": "RECCE", "count": 2, "strength": 30, "behaviour": "probe", "waypoints": [{ "atS": 0, "cell": "B7" }, { "atS": 400, "cell": "C6" }] },
     { "id": "r-craft-1", "side": "RED", "callsign": "FAST CRAFT PAIR", "type": "SHIP", "count": 2, "strength": 40, "waypoints": [{ "atS": 0, "cell": "H7" }, { "atS": 300, "cell": "H6" }, { "atS": 600, "cell": "H5" }] }
   ],
   "sensors": [

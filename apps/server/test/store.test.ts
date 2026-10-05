@@ -85,3 +85,26 @@ describe('demo seed', () => {
     void randomUUID;
   });
 });
+
+describe('clock checkpoints (restart keeps sim time)', () => {
+  it('logs a checkpoint every 30 sim-seconds and resumes from it after a restart', async () => {
+    const store = new MemoryEventStore();
+    const m1 = new SessionManager(store, scenarios, { tickHz: 1 });
+    const settings = { ewIntensity: 'high', sensorReliability: 'low', commsQuality: 'poor', opfor: 'adaptive', disabledMsel: ['IB-01'] } as const;
+    const { session } = await m1.create('iron-bridge', 99, ['CDR', 'PL_A'], { ...settings, disabledMsel: [...settings.disabledMsel] });
+    session.dsCommand({ type: 'START' });
+    session.stopClock();
+    for (let i = 0; i < 65; i++) session.tick();
+    await session.flush();
+    expect(session.events.filter((e) => e.type === 'CLOCK_CHECKPOINT')).toHaveLength(2);
+    session.dispose();
+    const m2 = new SessionManager(store, scenarios, { tickHz: 1 });
+    await m2.rehydrateAll();
+    const back = m2.get(session.code)!;
+    expect(back.sim.state.tMs).toBe(60_000);
+    expect(back.phase).toBe('PAUSED');
+    expect(back.sim.ctx.settings.ewIntensity).toBe('high');
+    expect(back.sim.state.msel.find((m) => m.id === 'IB-01')!.status).toBe('SKIPPED');
+    back.dispose();
+  });
+});

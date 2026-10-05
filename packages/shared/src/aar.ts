@@ -74,7 +74,8 @@ export type TimelineKind =
   | 'ENGAGEMENT'
   | 'STRIKE'
   | 'FEATURE'
-  | 'PACE';
+  | 'PACE'
+  | 'OPFOR';
 
 export interface TimelineEvent {
   tMs: number;

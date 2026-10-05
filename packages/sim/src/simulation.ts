@@ -12,7 +12,9 @@ import {
   type PayloadOf,
   type RoleId,
   type Scenario,
+  type SessionSettings,
   type SimEvent,
+  DEFAULT_SETTINGS,
 } from '@vanguard/shared';
 import { adjudicate, airOnStation, commsDeficit, intentScore, resolveEngagement, resolveStrike } from './adjudication';
 import { hashValue } from './hash';
@@ -29,6 +31,7 @@ import {
   sensorSweep,
 } from './intel';
 import { isCutOff, roleChannelStatus } from './links';
+import { reactOpfor } from './opfor';
 import { deliverDue, transmit } from './pipeline';
 import { generateProbe, scoreAnswer } from './probes';
 import { knowableSnapshot, truthSnapshot } from './projection';
@@ -65,8 +68,9 @@ export class Simulation {
     readonly scenario: Scenario,
     seed: number,
     enabledRoles?: RoleId[],
+    settings: SessionSettings = DEFAULT_SETTINGS,
   ) {
-    this.ctx = makeCtx(scenario, createInitialState(scenario, seed, enabledRoles));
+    this.ctx = makeCtx(scenario, createInitialState(scenario, seed, enabledRoles, settings), settings);
   }
 
   get state(): SimState {
@@ -106,6 +110,7 @@ export class Simulation {
     const s = ctx.s;
     switch (e.type) {
       case 'SESSION_CREATED':
+      case 'CLOCK_CHECKPOINT':
         return;
       case 'ROLE_JOINED': {
         const rs = roleState(s, e.payload.roleId);
@@ -727,6 +732,7 @@ export class Simulation {
       }
     }
 
+    reactOpfor(ctx);
     generateSpoofs(ctx);
 
     for (const st of s.sensors) {

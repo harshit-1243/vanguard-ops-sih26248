@@ -12,7 +12,7 @@ import {
   type RoleId,
   type Vec,
 } from '@vanguard/shared';
-import type { ActiveInject, Ctx } from './state';
+import { EW_MULT, type ActiveInject, type Ctx } from './state';
 import { unitPos } from './tracks';
 
 export interface LegResult {
@@ -45,7 +45,7 @@ export function jamLeg(ctx: Ctx, ch: ChannelDef, a: Vec, b: Vec): LegResult {
   if (ch.band === 'NONE') return { level, jamming: false, power, causes };
   for (const j of ctx.s.jammers) {
     if (!j.active || !j.bands.includes(ch.band as never)) continue;
-    const R = j.radius * j.power;
+    const R = j.radius * j.power * EW_MULT[ctx.settings.ewIntensity];
     const d = Math.min(dist(a, j.pos), dist(b, j.pos)) / R;
     const l: LinkLevel = d <= 0.5 ? 2 : d <= 1 ? 1 : 0;
     if (l > 0) {

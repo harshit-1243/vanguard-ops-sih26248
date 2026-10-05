@@ -20,7 +20,7 @@ import { brief, airOnStation, rho, unitsInCell } from './adjudication';
 import { detectConflicts } from './conflicts';
 import { effectiveLink, hintFor, levelName, roleChannelStatus, roleLink, sharedChannels } from './links';
 import { probeStatus } from './probes';
-import type { Ctx, MselState } from './state';
+import { EW_MULT, type Ctx, type MselState } from './state';
 import { isMoving, perceivedOwnPos, roleUnit, unitPos } from './tracks';
 
 export const CONTACT_MAX_AGE_MS = 900_000;
@@ -399,6 +399,7 @@ export function projectTruth(ctx: Ctx, sessionCode: string, connected: ReadonlyS
         cell: vecToCell(p),
         status: u.status,
         ownerRole: u.ownerRole,
+        behaviour: u.behaviour,
         destination: isMoving(u, s.tMs) ? vecToCell(last) : null,
       };
     }),
@@ -407,6 +408,7 @@ export function projectTruth(ctx: Ctx, sessionCode: string, connected: ReadonlyS
       label: j.label ?? j.id,
       cell: j.cell,
       radius: j.radius,
+      effectiveRadius: Math.round(j.radius * j.power * EW_MULT[ctx.settings.ewIntensity] * 100) / 100,
       bands: [...j.bands],
       power: j.power,
       active: j.active,

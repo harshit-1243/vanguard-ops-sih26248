@@ -6,6 +6,7 @@ import {
   InjectSpecSchema,
   JammerSpecSchema,
   RoleIdSchema,
+  SessionSettingsSchema,
   SpeedSchema,
   UnitTypeSchema,
 } from './domain';
@@ -73,6 +74,7 @@ export const CreateSessionBodySchema = z.object({
   scenarioId: z.string().regex(/^[a-z0-9-]+$/),
   seed: z.number().int().min(0).max(2 ** 31 - 1).optional(),
   enabledRoles: z.array(RoleIdSchema).min(2).max(6).optional(),
+  settings: SessionSettingsSchema.optional(),
 });
 export type CreateSessionBody = z.infer<typeof CreateSessionBodySchema>;
 

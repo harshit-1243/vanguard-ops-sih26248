@@ -161,3 +161,21 @@ export const PROBE_KINDS = [
   'LINK_STATUS',
 ] as const;
 export type ProbeKind = (typeof PROBE_KINDS)[number];
+
+/** Exercise difficulty / scenario variables chosen by the DS at creation (PS outcome 3). */
+export const SessionSettingsSchema = z
+  .object({
+    /** Multiplies every jammer's effective radius. */
+    ewIntensity: z.enum(['low', 'normal', 'high']).default('normal'),
+    /** Sensor-feed loss and corruption. */
+    sensorReliability: z.enum(['high', 'normal', 'low']).default('normal'),
+    /** Radio/SATCOM latency and loss. */
+    commsQuality: z.enum(['good', 'normal', 'poor']).default('normal'),
+    /** Enemy follows its script only, or reacts to BLUE (deterministic rules). */
+    opfor: z.enum(['scripted', 'adaptive']).default('adaptive'),
+    /** MSEL items switched off for this exercise. */
+    disabledMsel: z.array(z.string().max(20)).max(50).default([]),
+  })
+  .default({});
+export type SessionSettings = z.infer<typeof SessionSettingsSchema>;
+export const DEFAULT_SETTINGS: SessionSettings = SessionSettingsSchema.parse(undefined);

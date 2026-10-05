@@ -13,3 +13,4 @@ export * from './simulation';
 export * from './replay';
 export * from './metrics';
 export * from './aar';
+export * from './opfor';

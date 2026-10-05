@@ -106,7 +106,7 @@ export function truthLayers(t: InstructorState): { markers: MapMarker[]; jammers
   }));
   const jammers: MapJammer[] = t.jammers.map((j) => {
     const c = cellCentre(j.cell);
-    return { id: j.id, x: c.x, y: c.y, radius: j.radius * j.power, active: j.active, label: `${j.label} [${j.bands.join('/')}]` };
+    return { id: j.id, x: c.x, y: c.y, radius: j.effectiveRadius, active: j.active, label: `${j.label} [${j.bands.join('/')}]` };
   });
   const unitOf = (role: string) => t.units.find((u) => u.ownerRole === role);
   const links: MapLink[] = [];

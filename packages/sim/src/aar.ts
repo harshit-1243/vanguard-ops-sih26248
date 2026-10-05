@@ -147,7 +147,7 @@ function frame(ctx: Ctx, view: 'truth' | RoleId, note: string | null): ReplayFra
     return {
       tMs: s.tMs,
       units: t.units.map((u) => ({ id: u.id, side: u.side, label: u.decoy ? `DECOY ${u.count}x` : u.callsign, type: u.type, cell: u.cell, x: u.pos.x, y: u.pos.y, status: u.status, decoy: u.decoy })),
-      jammers: t.jammers.map((j) => ({ cell: j.cell, radius: j.radius * j.power, active: j.active })),
+      jammers: t.jammers.map((j) => ({ cell: j.cell, radius: j.effectiveRadius, active: j.active })),
       cutOff: t.roles.filter((r) => r.cutOff).map((r) => r.role),
       note,
     };

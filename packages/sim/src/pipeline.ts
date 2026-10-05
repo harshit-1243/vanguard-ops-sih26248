@@ -12,6 +12,7 @@ import {
   type Vec,
 } from '@vanguard/shared';
 import { effectiveLink, injectApplies, nodePos } from './links';
+import { markSpotted } from './opfor';
 import { chance, pick, randInt, uniform } from './rng';
 import {
   journal,
@@ -268,6 +269,8 @@ export function deliverDue(ctx: Ctx): void {
     bump(s.stats.channels, d.channel, 'delivered');
     if (d.payload.kind === 'INTEL') {
       const item = { ...d.payload.item, deliveredAtMs: s.tMs };
+      const meta = s.reportMeta[item.id];
+      if (meta && !meta.spoofed) markSpotted(ctx, meta.truthUnitIds);
       rs.intel.push(item);
       if (rs.intel.length > 400) rs.intel.splice(0, rs.intel.length - 400);
     } else {

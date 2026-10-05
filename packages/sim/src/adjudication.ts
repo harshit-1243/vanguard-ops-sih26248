@@ -231,6 +231,7 @@ export function resolveStrike(ctx: Ctx, cell: Cell, role: RoleId): string {
   let realHit = 0;
   let decoyHit = 0;
   for (const u of reds) {
+    u.lastSpottedMs = s.tMs;
     if (u.decoy) {
       u.status = 'DESTROYED';
       decoyHit++;

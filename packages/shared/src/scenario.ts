@@ -59,6 +59,13 @@ export const UnitSpecSchema = z.object({
   /** Cells per minute. Defaults by type when omitted. */
   speed: z.number().min(0).max(5).optional(),
   visualRangeCells: z.number().min(0).max(4).optional(),
+  /**
+   * OPFOR behaviour when the session runs with adaptive OPFOR (deterministic rules, PRD §8.1):
+   * scripted = follow waypoints only · reserve = counter-attack an objective BLUE threatens ·
+   * defend = fall back from superior BLUE · shoot-and-scoot = relocate after being spotted/struck ·
+   * probe = shadow the nearest BLUE unit.
+   */
+  behaviour: z.enum(['scripted', 'reserve', 'defend', 'shoot-and-scoot', 'probe']).default('scripted'),
   waypoints: z.array(z.object({ atS: z.number().min(0), cell: CellSchema })).min(1),
 });
 export type UnitSpec = z.infer<typeof UnitSpecSchema>;

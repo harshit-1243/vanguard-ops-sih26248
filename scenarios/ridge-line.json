@@ -78,9 +78,9 @@
       "id": "r-inf-1", "side": "RED", "callsign": "HOSTILE INFANTRY COY", "type": "INFANTRY", "count": 6, "strength": 120,
       "waypoints": [{ "atS": 0, "cell": "H5" }, { "atS": 420, "cell": "G5" }, { "atS": 840, "cell": "F5" }, { "atS": 1140, "cell": "E5" }, { "atS": 1440, "cell": "D5" }]
     },
-    { "id": "r-recce-1", "side": "RED", "callsign": "HOSTILE PATROL", "type": "RECCE", "count": 2, "strength": 30, "waypoints": [{ "atS": 0, "cell": "H2" }, { "atS": 480, "cell": "F2" }, { "atS": 900, "cell": "E3" }] },
+    { "id": "r-recce-1", "side": "RED", "callsign": "HOSTILE PATROL", "type": "RECCE", "count": 2, "strength": 30, "behaviour": "probe", "waypoints": [{ "atS": 0, "cell": "H2" }, { "atS": 480, "cell": "F2" }, { "atS": 900, "cell": "E3" }] },
     { "id": "r-decoy-1", "side": "RED", "callsign": "DUMMY POSITION F4", "type": "MECH", "count": 4, "strength": 0, "decoy": true, "waypoints": [{ "atS": 0, "cell": "F4" }] },
-    { "id": "r-mortar-1", "side": "RED", "callsign": "HOSTILE MORTAR LINE", "type": "ARTILLERY", "count": 3, "strength": 50, "waypoints": [{ "atS": 0, "cell": "G6" }] },
+    { "id": "r-mortar-1", "side": "RED", "callsign": "HOSTILE MORTAR LINE", "type": "ARTILLERY", "count": 3, "strength": 50, "behaviour": "shoot-and-scoot", "waypoints": [{ "atS": 0, "cell": "G6" }] },
     { "id": "r-convoy-1", "side": "RED", "callsign": "HOSTILE RESUPPLY CONVOY", "type": "CONVOY", "count": 6, "strength": 30, "waypoints": [{ "atS": 0, "cell": "H8" }, { "atS": 600, "cell": "G7" }, { "atS": 1200, "cell": "G6" }, { "atS": 1600, "cell": "F5" }] },
     { "id": "r-raid-1", "side": "RED", "callsign": "HOSTILE RAIDERS", "type": "INFANTRY", "count": 2, "strength": 40, "waypoints": [{ "atS": 0, "cell": "E8" }, { "atS": 900, "cell": "D8" }, { "atS": 1400, "cell": "C8" }] }
   ],
