@@ -16,7 +16,7 @@ export function DecisionCard({ d, feedback, revealAll, highlight }: { d: Decisio
   const k = d.knowable;
   const cited = k.intel.filter((i) => d.basedOn.includes(i.id));
   return (
-    <article id={`card-${d.id}`} className={cn('rounded-lg border bg-panel', highlight ? 'border-accent' : 'border-line')} aria-label={`Decision ${d.id}`}>
+    <article id={`card-${d.id}`} className={cn('scroll-mt-20 rounded-lg border bg-panel', highlight ? 'border-accent' : 'border-line')} aria-label={`Decision ${d.id}`}>
       <header className="flex flex-wrap items-center gap-2 border-b border-line px-4 py-2.5">
         <span className="font-mono text-xs text-muted">{d.id}</span>
         <span className="font-mono text-sm">{formatT(d.tMs)}</span>

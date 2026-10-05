@@ -88,7 +88,9 @@ export function perceivedLayers(p: PerceivedPicture): { markers: MapMarker[]; ja
 
 /** DS ground-truth view → map layers. */
 export function truthLayers(t: InstructorState): { markers: MapMarker[]; jammers: MapJammer[]; links: MapLink[]; relays: { id: string; x: number; y: number; label: string; active: boolean }[] } {
-  const markers: MapMarker[] = t.units.map((u) => ({
+  const enabled = new Set(t.roles.filter((r) => r.enabled).map((r) => r.role));
+  // Units of roles not in play (e.g. optional NLO) are hidden to keep the god view uncluttered.
+  const markers: MapMarker[] = t.units.filter((u) => !u.ownerRole || enabled.has(u.ownerRole)).map((u) => ({
     id: u.id,
     side: u.side,
     x: u.pos.x,

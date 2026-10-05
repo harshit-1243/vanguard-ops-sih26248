@@ -21,8 +21,10 @@ pnpm check             # lint + typecheck + unit tests (the phase gate)
 pnpm test:coverage     # sim coverage (threshold 90% lines)
 pnpm build             # all packages; server -> apps/server/dist, web -> apps/web/dist
 pnpm start             # serve built web + API on :8080
-pnpm e2e               # Playwright (builds nothing; expects `pnpm build` first)
-pnpm seed:demo         # create a finished demo exercise (needs DATABASE_URL or prints a JSON log)
+pnpm e2e               # Playwright (expects `pnpm build` first; `pnpm e2e:full` builds)
+pnpm --filter @vanguard/server smoke <url>   # live smoke test (health, sessions, sockets, AAR, PDF)
+SCREENSHOTS=1 pnpm e2e e2e/screenshots.spec.ts  # regenerate docs/screenshots
+pnpm seed:demo         # finished demo exercise (persisted with DATABASE_URL, else PDF + log to ./.data)
 docker compose up      # full offline stack (app + postgres [+ ollama profile])
 ```
 

@@ -64,8 +64,21 @@
 - **Verified natively (Docker is not installed on this machine):** built → `pnpm deploy --prod` → `prisma generate` in the deploy dir → migrations applied to a fresh UTF-8 Postgres → deployed bundle starts (store=postgres), seeds the demo, serves the SPA and API → restarted: no re-seed, AAR + PDF rebuilt from the Postgres event log. Fixed: relative SCENARIOS_DIR/WEB_DIST now resolved to absolute paths.
 - **Not yet verified:** `docker build` / `docker compose up` themselves — will be exercised by the CI docker job (Phase 10) and can be run locally after installing Docker Desktop.
 
+## Phase 10 — GitHub ✅ (2026-10-05)
+- Repo: https://github.com/harshit-1243/vanguard-ops-sih26248 (public, created by the user; pushed over HTTPS — no gh CLI on this machine). Description/topics to be set in the GitHub UI.
+- Secret scan before push: gitleaks not installed → grep for key patterns (Anthropic/AWS/GitHub/Slack/Google keys, private keys, non-local DB URLs): clean; only `.env.example` tracked; `.env` ignored.
+- **CI green on the first push** (run 37279537271): job 1 lint · typecheck · unit+integration (incl. **Postgres store test** against a service container and the leak test) · sim coverage · build · Playwright E2E + axe; job 2 **docker compose up --build from a clean clone** → healthy on Postgres → SPA/API/demo AAR/PDF smoke → restart keeps data.
+
+## Phase 11 — Deploy ⏳ (waiting for the user's Render account)
+- `render.yaml` Blueprint: Docker web service (WebSockets native) + Render Postgres, /healthz, migrations on start, demo seeded when DB empty, AI off.
+- `pnpm --filter @vanguard/server smoke <url>`: health → create → 2 trainee sockets → start ×4 → inject + jammer → PL_B cut off → message → end → AAR + PDF. Passes locally against the production build.
+- Pending: user creates the Blueprint on Render; then run the smoke test against the live URL and add it to the README.
+
+## Phase 12 — Handover docs ✅ (2026-10-05, live URL pending)
+- README (pitch, PS mapping, 10 screenshots captured by Playwright into docs/screenshots, Mermaid architecture, quick start, Docker, Render deploy steps, Why, safety, team placeholders), docs/DEMO_SCRIPT.md (3-min timed demo + Q&A), docs/PITCH_NOTES.md.
+
 ## Pending
-- Phase 10 GitHub (needs repo name/visibility + gh) → Phase 12 handover.
+- Live deployment + smoke test (needs Render).
 
 ## Known issues
 - None yet.
