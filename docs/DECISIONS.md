@@ -63,3 +63,26 @@ log and replay stays deterministic. AI output is always labelled "AI-generated d
 **D-015 · 2026-10-05 · One-click demo endpoint (`POST /api/demo`, rate-limited).**
 Plays the scripted Iron Bridge demo to the end so a judge can open a full AAR in seconds; the same
 code backs `pnpm seed:demo`.
+
+**D-016 · 2026-10-05 · MapLibre GL map (supersedes D-001), SVG kept as fallback.**
+After hands-on testing the user preferred MapLibre. The fictional grid is drawn as local GeoJSON on
+a blank style (no tiles, no glyph server — labels are HTML markers), so it stays fully offline. Adds
+pan/zoom/rotate, a 3D "sand table" tilt with extruded ridges/hills/urban, tweened unit movement,
+sector popups and hover. When WebGL is unavailable (or `?map=svg`) the original SVG map renders.
+Headless E2E runs Chromium with SwiftShader for WebGL.
+
+**D-017 · 2026-10-05 · Deterministic adaptive OPFOR, no LLM.**
+Enemy reactions (reserve counter-attack, defend/fall back, shoot-and-scoot, probe) are rules over
+state, evaluated every 30 s with the seeded RNG, so they are explainable in the debrief and replays
+stay identical. LLM-driven OPFOR was rejected: non-deterministic, costly, hard to adjudicate.
+
+**D-018 · 2026-10-05 · Free-tier AI providers via one OpenAI-compatible adapter.**
+`LLM_PROVIDER=groq|cerebras|xai|openai` share a raw-HTTP chat-completions adapter (presets: Groq
+`llama-3.3-70b-versatile`, Cerebras `llama-3.3-70b`, xAI `grok-3-mini`; override with `LLM_MODEL`).
+Anthropic and Ollama remain. AAR AI drafts run only for ended exercises to protect free quotas.
+
+**D-019 · 2026-10-05 · Clock checkpoints.** A `CLOCK_CHECKPOINT` input event (no state change) is
+logged every 30 sim-seconds so a restarted server resumes within 30 s of where it stopped.
+
+**D-020 · 2026-10-05 · Exercise variables at creation.** EW intensity, sensor reliability, comms
+quality, OPFOR mode and per-item MSEL toggles are stored in `SESSION_CREATED.settings` (replay-safe).

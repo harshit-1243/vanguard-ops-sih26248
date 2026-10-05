@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Check, Copy } from 'lucide-react';
-import type { CreateSessionResponse, RoleId, ScenarioSummary } from '@vanguard/shared';
+import { DEFAULT_SETTINGS, formatT, type CreateSessionResponse, type RoleId, type ScenarioSummary, type SessionSettings } from '@vanguard/shared';
 import { PageShell } from '@/components/shell';
-import { Badge, Button, Input, Label, Panel } from '@/components/ui/primitives';
+import { Badge, Button, Input, Label, Panel, Select } from '@/components/ui/primitives';
 import { api } from '@/lib/api';
 import { saveIdentity } from '@/lib/identity';
 import { cn } from '@/lib/utils';
@@ -36,6 +36,7 @@ export default function Create() {
   const [selected, setSelected] = useState<ScenarioSummary | null>(null);
   const [roles, setRoles] = useState<RoleId[]>([]);
   const [seed, setSeed] = useState('');
+  const [settings, setSettings] = useState<SessionSettings>(DEFAULT_SETTINGS);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [created, setCreated] = useState<CreateSessionResponse | null>(null);
@@ -49,6 +50,7 @@ export default function Create() {
     setSelected(s);
     setRoles(s.roles.filter((r) => !r.optional).map((r) => r.id));
     setSeed(String(s.defaultSeed));
+    setSettings(DEFAULT_SETTINGS);
   };
 
   const create = async () => {
@@ -56,7 +58,7 @@ export default function Create() {
     setBusy(true);
     setError(null);
     try {
-      const r = await api.create(selected.id, roles, seed ? Number(seed) : undefined);
+      const r = await api.create(selected.id, roles, seed ? Number(seed) : undefined, settings);
       saveIdentity(r.code, { token: r.instructorToken, actor: 'DS', pin: r.pin });
       setCreated(r);
     } catch (e) {
@@ -144,6 +146,40 @@ export default function Create() {
                     );
                   })}
                 </div>
+              </fieldset>
+              <fieldset className="grid gap-3">
+                <legend className="mb-1 text-[11px] font-medium uppercase tracking-wider text-muted">Exercise variables (difficulty)</legend>
+                <div className="grid grid-cols-2 gap-3">
+                  {(
+                    [
+                      ['ewIntensity', 'EW intensity', [['low', 'Low (×0.75 jammer radius)'], ['normal', 'Normal'], ['high', 'High (×1.3 jammer radius)']]],
+                      ['sensorReliability', 'Sensor reliability', [['high', 'High'], ['normal', 'Normal'], ['low', 'Low (more loss & garble)']]],
+                      ['commsQuality', 'Comms quality', [['good', 'Good'], ['normal', 'Normal'], ['poor', 'Poor (slower, lossier)']]],
+                      ['opfor', 'Enemy (OPFOR)', [['adaptive', 'Adaptive — reacts to you'], ['scripted', 'Scripted only']]],
+                    ] as const
+                  ).map(([key, label, opts]) => (
+                    <div key={key}>
+                      <Label htmlFor={`set-${key}`}>{label}</Label>
+                      <Select id={`set-${key}`} value={settings[key]} onChange={(e) => setSettings((x) => ({ ...x, [key]: e.target.value }))}>
+                        {opts.map(([v, t]) => <option key={v} value={v}>{t}</option>)}
+                      </Select>
+                    </div>
+                  ))}
+                </div>
+                <details className="rounded-md border border-line p-2">
+                  <summary className="cursor-pointer text-xs text-muted">Scripted injects (MSEL) — {selected.msel.length - settings.disabledMsel.length}/{selected.msel.length} on</summary>
+                  <ul className="mt-2 grid max-h-48 gap-1 overflow-y-auto text-xs">
+                    {selected.msel.map((m) => (
+                      <li key={m.id}>
+                        <label className="flex items-center gap-2">
+                          <input type="checkbox" className="accent-[var(--color-accent)]" checked={!settings.disabledMsel.includes(m.id)} onChange={(e) => setSettings((x) => ({ ...x, disabledMsel: e.target.checked ? x.disabledMsel.filter((y) => y !== m.id) : [...x.disabledMsel, m.id] }))} />
+                          <span className="font-mono text-muted">{formatT(m.atS * 1000)}</span>
+                          <span>{m.title}</span>
+                        </label>
+                      </li>
+                    ))}
+                  </ul>
+                </details>
               </fieldset>
               <div className="max-w-40">
                 <Label htmlFor="seed">Seed (replayable)</Label>

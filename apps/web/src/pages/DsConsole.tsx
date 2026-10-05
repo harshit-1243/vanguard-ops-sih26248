@@ -4,9 +4,11 @@ import { Activity, Crosshair, Eye, FileBarChart, Gauge, ListChecks, MousePointer
 import { formatT, type Band, type InstructorState, type RoleId } from '@vanguard/shared';
 import { Brand, Toast } from '@/components/shell';
 import { ConnDot } from '@/components/status';
-import { MapLegend, TacticalMap } from '@/components/map/TacticalMap';
+import { MapLegend } from '@/components/map/TacticalMap';
+import { MapView } from '@/components/map/MapView';
 import { truthLayers } from '@/components/map/adapters';
 import { ActiveEffects, CyberControls, InjectComposer } from '@/components/ds/InjectComposer';
+import { AiAdvisor, AiChip } from '@/components/ds/AiAdvisor';
 import { DecisionFeed, JammerList, JournalPanel, MselPanel, RosterPanel, SaCommsPanel } from '@/components/ds/Panels';
 import { RoleWorkspace } from '@/components/trainee/RoleWorkspace';
 import { Badge, Button, Disclaimer, Input, Label, Panel, SectionTitle, Textarea } from '@/components/ui/primitives';
@@ -201,7 +203,9 @@ export default function DsConsole() {
         {view === 'truth' ? (
           <section className="flex min-h-[420px] flex-col border-r border-line p-3" aria-label="Ground-truth map">
             <div className="min-h-0 flex-1">
-              <TacticalMap
+              <MapView
+                animMs={Math.round(900 / truth.speed)}
+                describeCell={(cell) => truth.links.filter((l) => l.level !== 'CLEAR' && truth.roles.find((r) => r.role === l.a)?.trueCell === cell).map((l) => `${l.a}→${l.b} ${l.channel}: ${l.level}${l.causes.length ? ` (${l.causes.join(', ')})` : ''}`)}
                 terrain={truth.terrain}
                 features={truth.features}
                 objectives={truth.objectives}
@@ -237,7 +241,9 @@ export default function DsConsole() {
                 <TabsTrigger value="log"><ScrollText size={13} aria-hidden /> Log</TabsTrigger>
               </TabsList>
               <TabsContent value="injects">
-                <SectionTitle>Live inject composer</SectionTitle>
+                <SectionTitle right={<AiChip />}>AI inject advisor</SectionTitle>
+                <AiAdvisor code={code} live={truth.phase === 'RUNNING' || truth.phase === 'PAUSED'} cmd={cmd} />
+                <SectionTitle className="border-t">Live inject composer</SectionTitle>
                 <InjectComposer t={truth} cmd={cmd} />
                 <SectionTitle className="border-t">Cyber events</SectionTitle>
                 <CyberControls t={truth} cmd={cmd} />

@@ -14,7 +14,8 @@ export async function aarFor(session: LiveSession, enrich?: AarEnricher): Promis
   const hit = aarCache.get(session);
   if (hit && hit.key === key) return hit.aar;
   let aar = buildAar(session.sim.ctx, session.code);
-  if (enrich) aar = await enrich(aar);
+  // AI drafts only for finished exercises (keeps free-tier quotas for the debrief).
+  if (enrich && session.phase === 'ENDED') aar = await enrich(aar);
   if (session.phase === 'ENDED') aarCache.set(session, { key, aar });
   return aar;
 }

@@ -137,3 +137,71 @@ describe('AI endpoints', () => {
     }
   });
 });
+
+describe('OpenAI-compatible providers (Groq / Cerebras / xAI)', () => {
+  it('selects presets only when a key is present, honours overrides', async () => {
+    const { OpenAiCompatibleProvider } = await import('../src/llm');
+    expect(createProvider(loadConfig({ LLM_PROVIDER: 'groq' }))).toBeNull();
+    expect(createProvider(loadConfig({ LLM_PROVIDER: 'groq', GROQ_API_KEY: 'k' }))!.name).toBe('groq:llama-3.3-70b-versatile');
+    expect(createProvider(loadConfig({ LLM_PROVIDER: 'cerebras', CEREBRAS_API_KEY: 'k' }))!.name).toBe('cerebras:llama-3.3-70b');
+    expect(createProvider(loadConfig({ LLM_PROVIDER: 'xai', XAI_API_KEY: 'k', LLM_MODEL: 'grok-x' }))!.name).toBe('xai:grok-x');
+    expect(createProvider(loadConfig({ LLM_PROVIDER: 'openai', LLM_API_KEY: 'k' }))).toBeNull();
+    expect(createProvider(loadConfig({ LLM_PROVIDER: 'openai', LLM_API_KEY: 'k', LLM_BASE_URL: 'http://x/v1', LLM_MODEL: 'm' }))).toBeInstanceOf(OpenAiCompatibleProvider);
+  });
+
+  it('posts chat completions and reads the first choice', async () => {
+    const { OpenAiCompatibleProvider } = await import('../src/llm');
+    const fetchMock = vi.fn(async () => new Response(JSON.stringify({ choices: [{ message: { content: ' draft ' } }] }), { status: 200 }));
+    vi.stubGlobal('fetch', fetchMock);
+    const p = new OpenAiCompatibleProvider('groq', 'https://api.groq.com/openai/v1/', 'secret', 'llama-3.3-70b-versatile');
+    expect(await p.generate('sys', 'hi')).toBe('draft');
+    const [url, init] = fetchMock.mock.calls[0] as unknown as [string, RequestInit];
+    expect(url).toBe('https://api.groq.com/openai/v1/chat/completions');
+    expect((init.headers as Record<string, string>).authorization).toBe('Bearer secret');
+    expect(JSON.parse(String(init.body))).toMatchObject({ model: 'llama-3.3-70b-versatile', messages: [{ role: 'system', content: 'sys' }, { role: 'user', content: 'hi' }] });
+    vi.stubGlobal('fetch', vi.fn(async () => new Response('rate limited', { status: 429 })));
+    await expect(p.generate('s', 'p')).rejects.toThrow(/HTTP 429/);
+    vi.stubGlobal('fetch', vi.fn(async () => new Response(JSON.stringify({ choices: [] }), { status: 200 })));
+    await expect(p.generate('s', 'p')).rejects.toThrow(/Empty/);
+  });
+});
+
+describe('AI inject advisor', () => {
+  it('suggests training-objective injects from live state; DS-only; apply works', async () => {
+    const { adviseRules } = await import('../src/advisor');
+    const srv = await startServer();
+    try {
+      const { code, instructorToken } = await createSession(srv, ['CDR', 'PL_A', 'PL_B']);
+      const s = srv.manager.get(code)!;
+      s.dsCommand({ type: 'START' });
+      s.stopClock();
+      s.advance(330);
+      const rules = adviseRules(s);
+      expect(rules.map((r) => r.id)).toEqual(['mission-command', 'pace', 'sa-probe']);
+      expect((await srv.api('POST', `/api/sessions/${code}/ai/advisor`, {})).status).toBe(401);
+      const r = await srv.api<{ suggestions: { id: string; command: unknown }[]; briefing: unknown }>('POST', `/api/sessions/${code}/ai/advisor`, {}, instructorToken);
+      expect(r.body.briefing).toBeNull();
+      const jam = r.body.suggestions.find((x) => x.id === 'mission-command')!;
+      expect(s.dsCommand(jam.command as never).ok).toBe(true);
+      expect(s.sim.state.jammers).toHaveLength(1);
+      s.advance(5);
+      expect(adviseRules(s).some((x) => x.id === 'mission-command')).toBe(false);
+    } finally {
+      await srv.close();
+    }
+  });
+
+  it('adds an AI briefing when a provider is configured, and survives provider failure', async () => {
+    const { advise } = await import('../src/advisor');
+    const m = new SessionManager(new MemoryEventStore(), ScenarioRegistry.fromDir(config.scenariosDir), { tickHz: 1 });
+    const { session } = await m.create('iron-bridge');
+    session.dsCommand({ type: 'START' });
+    session.stopClock();
+    session.advance(400);
+    const ok = await advise(session, fake(async () => 'Fire the jammer next.'));
+    expect(ok.briefing).toMatchObject({ source: 'ai', text: 'Fire the jammer next.' });
+    const bad = await advise(session, fake(async () => { throw new Error('quota'); }));
+    expect(bad.briefing).toBeNull();
+    expect(bad.suggestions.length).toBeGreaterThan(0);
+  });
+});

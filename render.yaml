@@ -21,9 +21,16 @@ services:
         value: '1'
       - key: LOG_LEVEL
         value: info
-      # Optional AI layer. Leave LLM_PROVIDER=none (fully functional, template text) unless you add a key.
+      # Optional AI layer: set LLM_PROVIDER to groq | cerebras | xai | anthropic and add the matching key
+      # in the dashboard (Environment). With none, everything works on template text.
       - key: LLM_PROVIDER
         value: none
+      - key: GROQ_API_KEY
+        sync: false
+      - key: CEREBRAS_API_KEY
+        sync: false
+      - key: LLM_MODEL
+        sync: false
       - key: ANTHROPIC_MODEL
         value: claude-opus-5-5
       - key: ANTHROPIC_API_KEY

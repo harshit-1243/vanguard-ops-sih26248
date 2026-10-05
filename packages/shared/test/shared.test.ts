@@ -164,7 +164,7 @@ describe('schemas', () => {
       summary: 's',
       durationMin: 1,
       defaultSeed: 1,
-      msel: [{}],
+      msel: [{ id: 'M', atS: 1, title: 't', action: { kind: 'REPORT' } }],
       roles: [{ id: 'CDR', title: 'C', callsign: 'K', optional: false, description: '' }],
     } as never);
     expect(s).toMatchObject({ id: 'x', mselCount: 1, roles: [{ id: 'CDR' }] });

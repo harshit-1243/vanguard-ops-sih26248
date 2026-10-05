@@ -1,4 +1,5 @@
 import { readFileSync } from 'node:fs';
+import { clickCell } from './map';
 import { expect, test, type Browser, type Page } from '@playwright/test';
 // @ts-expect-error — no types for the deep import (the package index runs a self-test)
 import pdfParse from 'pdf-parse/lib/pdf-parse.js';
@@ -66,7 +67,7 @@ test('Iron Bridge: DS + 3 trainees, jammer cut-off, decision, probe, AAR PDF', a
 
   // ---- DS places a jammer over PL B (G2, VHF+HF) using the map tool
   await ds.getByRole('button', { name: 'place jammer' }).click();
-  await ds.locator('[data-cell="G2"]').click();
+  await clickCell(ds, 'G2');
   await ds.getByRole('button', { name: 'Activate jammer' }).click();
   await expect(ds.getByRole('button', { name: 'PL_B ✕' })).toBeVisible();
 
@@ -74,7 +75,7 @@ test('Iron Bridge: DS + 3 trainees, jammer cut-off, decision, probe, AAR PDF', a
   await expect(plB.getByText('CUT OFF — ACT ON INTENT.')).toBeVisible();
   await plB.getByRole('tab', { name: /Decide/ }).click();
   await plB.getByRole('button', { name: 'Advance', exact: true }).click();
-  await plB.locator('[data-cell="F4"]').click();
+  await clickCell(plB, 'F4');
   await expect(plB.getByLabel('Target sector')).toHaveValue('F4');
   await plB.getByLabel('Rationale (required, ≥ 15 characters)').fill('Cut off from KESTREL 6; intent is to seize the bridge, so I close on F4.');
   await plB.getByRole('button', { name: 'Yes', exact: true }).click();

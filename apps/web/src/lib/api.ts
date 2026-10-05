@@ -4,6 +4,7 @@ import type {
   LobbyInfo,
   RoleId,
   ScenarioSummary,
+  SessionSettings,
 } from '@vanguard/shared';
 
 export class ApiError extends Error {
@@ -47,8 +48,8 @@ export interface Briefing {
 export const api = {
   demo: () => request<CreateSessionResponse>('POST', '/api/demo', {}),
   scenarios: () => request<ScenarioSummary[]>('GET', '/api/scenarios'),
-  create: (scenarioId: string, enabledRoles?: RoleId[], seed?: number) =>
-    request<CreateSessionResponse>('POST', '/api/sessions', { scenarioId, enabledRoles, seed }),
+  create: (scenarioId: string, enabledRoles?: RoleId[], seed?: number, settings?: SessionSettings) =>
+    request<CreateSessionResponse>('POST', '/api/sessions', { scenarioId, enabledRoles, seed, settings }),
   instructorLogin: (code: string, pin: string) =>
     request<{ instructorToken: string }>('POST', `/api/sessions/${code}/instructor`, { pin }),
   lobby: (code: string) => request<LobbyInfo>('GET', `/api/sessions/${code}/lobby`),

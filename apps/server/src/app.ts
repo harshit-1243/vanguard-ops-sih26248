@@ -11,6 +11,7 @@ import {
   RoleIdSchema,
   SessionCodeSchema,
 } from '@vanguard/shared';
+import { advise } from './advisor';
 import { aarFor, decisionsCsv, eventsJson, replayFor, type AarEnricher } from './aar';
 import { RateLimiter } from './auth';
 import { renderAarPdf } from './pdf';
@@ -61,6 +62,7 @@ export async function buildApp(
     onError: (err) => app.log.error(err, 'session error'),
   });
   const llm: LlmProvider | null = opts.llm !== undefined ? opts.llm : createProvider(config);
+  if (config.LLM_PROVIDER !== 'none' && !llm) app.log.warn(`LLM_PROVIDER=${config.LLM_PROVIDER} but no API key/model configured — using templates`);
   const enrichAar = opts.enrichAar ?? makeEnricher(llm, app.log);
   const pinLimiter = new RateLimiter(5, 60_000);
   const demoLimiter = new RateLimiter(3, 60_000);
@@ -169,6 +171,11 @@ export async function buildApp(
 
   // ---- Optional AI layer ----
   app.get('/api/ai/status', async () => ({ provider: llm?.name ?? 'none', enabled: !!llm }));
+  app.post('/api/sessions/:code/ai/advisor', async (req, reply) => {
+    const s = await sessionOr404((req.params as { code: string }).code);
+    if (s.resolveToken(bearer(req)) !== 'DS') return reply.code(401).send({ error: 'DS only' });
+    return advise(s, llm);
+  });
   app.post('/api/sessions/:code/ai/report-variants', async (req, reply) => {
     const s = await sessionOr404((req.params as { code: string }).code);
     if (s.resolveToken(bearer(req)) !== 'DS') return reply.code(401).send({ error: 'DS only' });

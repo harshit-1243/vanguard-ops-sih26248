@@ -6,6 +6,7 @@ import { Brand } from '@/components/shell';
 import { BarList, MetricCell, NetworkGraph, Swimlanes } from '@/components/aar/Charts';
 import { DecisionCard } from '@/components/aar/DecisionCard';
 import { ReplayPlayer } from '@/components/aar/ReplayPlayer';
+import { AiChip } from '@/components/ds/AiAdvisor';
 import { Heatmap } from '@/components/ds/Panels';
 import { Badge, Disclaimer, Panel, SectionTitle } from '@/components/ui/primitives';
 import { api, type ApiError } from '@/lib/api';
@@ -71,7 +72,8 @@ export default function Aar() {
             <a key={h} href={`#${h}`} className="hover:text-ink">{l}</a>
           ))}
         </nav>
-        <div className="ml-auto flex gap-2">
+        <div className="ml-auto flex items-center gap-2">
+          <AiChip />
           <a href={dl('aar.pdf')} download className="inline-flex h-8 items-center gap-1.5 rounded-md bg-accent px-3 text-xs font-semibold text-accent-ink" data-testid="export-pdf"><FileText size={13} /> PDF</a>
           <a href={dl('events.json')} download className="inline-flex h-8 items-center gap-1.5 rounded-md border border-line px-3 text-xs hover:border-muted"><FileJson size={13} /> JSON</a>
           <a href={dl('decisions.csv')} download className="inline-flex h-8 items-center gap-1.5 rounded-md border border-line px-3 text-xs hover:border-muted"><FileSpreadsheet size={13} /> CSV</a>

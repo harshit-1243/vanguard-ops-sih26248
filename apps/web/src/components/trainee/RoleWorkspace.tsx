@@ -1,7 +1,9 @@
 import { useMemo, useState } from 'react';
 import { FileText, Gavel, Radio, ScrollText } from 'lucide-react';
 import type { PerceivedPicture } from '@vanguard/shared';
-import { MapLegend, TacticalMap } from '@/components/map/TacticalMap';
+import { MapLegend } from '@/components/map/TacticalMap';
+import { MapView } from '@/components/map/MapView';
+import { formatAge } from '@vanguard/shared';
 import { perceivedLayers } from '@/components/map/adapters';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/radix';
 import { CommsPanel } from './CommsPanel';
@@ -33,7 +35,15 @@ export function RoleWorkspace({ p, cmd, readOnly }: { p: PerceivedPicture; cmd: 
             {!readOnly && <span className="font-mono text-muted">target: <span className="text-accent">{targetCell ?? '—'}</span></span>}
           </div>
           <div className="min-h-0 flex-1">
-            <TacticalMap
+            <MapView
+              animMs={Math.round(900 / p.speed)}
+              describeCell={(cell) =>
+                p.intel
+                  .filter((i) => i.cell === cell && i.kind !== 'POSREP')
+                  .slice(-3)
+                  .reverse()
+                  .map((i) => `${i.sourceLabel} · ${formatAge(p.tMs - i.observedAtMs)} ago: ${i.text}`)
+              }
               terrain={p.terrain}
               features={p.features}
               objectives={p.objectives}

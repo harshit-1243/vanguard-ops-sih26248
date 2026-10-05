@@ -1,3 +1,4 @@
+import { clickCell } from './map';
 import { expect, test, type Browser, type Page } from '@playwright/test';
 
 /**
@@ -51,13 +52,13 @@ test('capture README screenshots', async ({ browser, request }) => {
   await shot(cdr, '05-trainee-cdr-comms-pace');
 
   await ds.getByRole('button', { name: 'place jammer' }).click();
-  await ds.locator('[data-cell="G2"]').click();
+  await clickCell(ds, 'G2');
   await ds.getByRole('button', { name: 'Activate jammer' }).click();
   await ds.getByRole('button', { name: 'Resume' }).click();
   await expect(plB.getByText('CUT OFF — ACT ON INTENT.')).toBeVisible();
   await ds.getByRole('button', { name: 'Pause' }).click();
   await plB.getByRole('tab', { name: /Decide/ }).click();
-  await plB.locator('[data-cell="F4"]').click();
+  await clickCell(plB, 'F4');
   await plB.getByLabel('Rationale (required, ≥ 15 characters)').fill('Cut off from KESTREL 6 — acting on intent: close on the bridge from the east.');
   await shot(plB, '06-trainee-cut-off-decision');
   await plB.getByRole('button', { name: 'Yes', exact: true }).click();

@@ -83,9 +83,63 @@ export class OllamaProvider implements LlmProvider {
   }
 }
 
+/** OpenAI-compatible chat-completions API (Groq, Cerebras, xAI Grok, or any compatible endpoint). */
+export class OpenAiCompatibleProvider implements LlmProvider {
+  readonly name: string;
+  constructor(
+    label: string,
+    private readonly baseUrl: string,
+    private readonly apiKey: string,
+    private readonly model: string,
+  ) {
+    this.name = `${label}:${model}`;
+  }
+
+  async generate(system: string, prompt: string): Promise<string> {
+    const base = this.baseUrl.endsWith('/') ? this.baseUrl.slice(0, -1) : this.baseUrl;
+    const res = await fetch(`${base}/chat/completions`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json', authorization: `Bearer ${this.apiKey}` },
+      body: JSON.stringify({
+        model: this.model,
+        temperature: 0.3,
+        max_tokens: 1200,
+        messages: [
+          { role: 'system', content: system },
+          { role: 'user', content: prompt },
+        ],
+      }),
+      signal: AbortSignal.timeout(TIMEOUT_MS),
+    });
+    if (!res.ok) throw new Error(`${this.name} HTTP ${res.status}: ${(await res.text()).slice(0, 200)}`);
+    const data = (await res.json()) as { choices?: { message?: { content?: string } }[] };
+    const text = (data.choices?.[0]?.message?.content ?? '').trim();
+    if (!text) throw new Error('Empty response');
+    return text;
+  }
+}
+
+/** Free-tier friendly presets; override the model with LLM_MODEL (providers rename models often). */
+export const OPENAI_COMPAT_PRESETS = {
+  groq: { baseUrl: 'https://api.groq.com/openai/v1', model: 'llama-3.3-70b-versatile' },
+  cerebras: { baseUrl: 'https://api.cerebras.ai/v1', model: 'llama-3.3-70b' },
+  xai: { baseUrl: 'https://api.x.ai/v1', model: 'grok-3-mini' },
+} as const;
+
 export function createProvider(config: Config): LlmProvider | null {
-  if (config.LLM_PROVIDER === 'anthropic') return new AnthropicProvider(config.ANTHROPIC_API_KEY, config.ANTHROPIC_MODEL);
-  if (config.LLM_PROVIDER === 'ollama') return new OllamaProvider(config.OLLAMA_URL, config.OLLAMA_MODEL);
+  const p = config.LLM_PROVIDER;
+  if (p === 'anthropic') return new AnthropicProvider(config.ANTHROPIC_API_KEY, config.ANTHROPIC_MODEL);
+  if (p === 'ollama') return new OllamaProvider(config.OLLAMA_URL, config.OLLAMA_MODEL);
+  if (p === 'groq' || p === 'cerebras' || p === 'xai') {
+    const preset = OPENAI_COMPAT_PRESETS[p];
+    const key = config.LLM_API_KEY || (p === 'groq' ? config.GROQ_API_KEY : p === 'cerebras' ? config.CEREBRAS_API_KEY : config.XAI_API_KEY);
+    if (!key) return null; // no key → templates (logged at start-up)
+    return new OpenAiCompatibleProvider(p, config.LLM_BASE_URL || preset.baseUrl, key, config.LLM_MODEL || preset.model);
+  }
+  if (p === 'openai') {
+    if (!config.LLM_API_KEY || !config.LLM_BASE_URL || !config.LLM_MODEL) return null;
+    return new OpenAiCompatibleProvider('openai', config.LLM_BASE_URL, config.LLM_API_KEY, config.LLM_MODEL);
+  }
   return null;
 }
 

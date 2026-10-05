@@ -237,6 +237,7 @@ export interface ScenarioSummary {
   defaultSeed: number;
   roles: { id: RoleId; title: string; callsign: string; optional: boolean; description: string }[];
   mselCount: number;
+  msel: { id: string; atS: number; title: string; kind: string }[];
 }
 
 export function summarizeScenario(s: Scenario): ScenarioSummary {
@@ -255,5 +256,6 @@ export function summarizeScenario(s: Scenario): ScenarioSummary {
       description: r.description,
     })),
     mselCount: s.msel.length,
+    msel: s.msel.map((m) => ({ id: m.id, atS: m.atS, title: m.title, kind: m.action.kind })),
   };
 }
