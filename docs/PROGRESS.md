@@ -69,16 +69,17 @@
 - Secret scan before push: gitleaks not installed → grep for key patterns (Anthropic/AWS/GitHub/Slack/Google keys, private keys, non-local DB URLs): clean; only `.env.example` tracked; `.env` ignored.
 - **CI green on the first push** (run 37279537271): job 1 lint · typecheck · unit+integration (incl. **Postgres store test** against a service container and the leak test) · sim coverage · build · Playwright E2E + axe; job 2 **docker compose up --build from a clean clone** → healthy on Postgres → SPA/API/demo AAR/PDF smoke → restart keeps data.
 
-## Phase 11 — Deploy ⏳ (waiting for the user's Render account)
-- `render.yaml` Blueprint: Docker web service (WebSockets native) + Render Postgres, /healthz, migrations on start, demo seeded when DB empty, AI off.
-- `pnpm --filter @vanguard/server smoke <url>`: health → create → 2 trainee sockets → start ×4 → inject + jammer → PL_B cut off → message → end → AAR + PDF. Passes locally against the production build.
-- Pending: user creates the Blueprint on Render; then run the smoke test against the live URL and add it to the README.
+## Phase 11 — Deploy ✅ (2026-10-05)
+- Live: **https://vanguard-ops-0uex.onrender.com** — Render Blueprint (`render.yaml`): Docker web service + Render Postgres (free plans), created by the user.
+- Health: `{"ok":true,"store":"postgres"}`; demo exercise auto-seeded on first boot.
+- Live smoke test (`pnpm --filter @vanguard/server smoke https://vanguard-ops-0uex.onrender.com`) — **PASSED**: health (postgres) → session created → DS + 2 trainee sockets over Render's proxy → start ×4 → inject + jammer → PL_B cut off → trainee message → end → AAR JSON → PDF. Also: SPA + deep link 200, both scenarios listed, one-click demo AAR (10 decisions, 2 probes) + PDF.
+- Notes: free web service sleeps after ~15 min idle (≈1 min cold start); free Postgres expires after 30 days.
 
-## Phase 12 — Handover docs ✅ (2026-10-05, live URL pending)
+## Phase 12 — Handover docs ✅ (2026-10-05)
 - README (pitch, PS mapping, 10 screenshots captured by Playwright into docs/screenshots, Mermaid architecture, quick start, Docker, Render deploy steps, Why, safety, team placeholders), docs/DEMO_SCRIPT.md (3-min timed demo + Q&A), docs/PITCH_NOTES.md.
 
 ## Pending
-- Live deployment + smoke test (needs Render).
+- Nothing blocking. Optional: set repo topics/description in the GitHub UI; fill in team names in the README.
 
 ## Known issues
 - None yet.

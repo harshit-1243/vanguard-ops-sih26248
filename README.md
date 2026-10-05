@@ -7,7 +7,7 @@ Smart India Hackathon 2026 · PS **SIH26248** · Ministry of Defence — DSSC We
 
 > **A browser-based closed wargame in which every commander sees a different, deliberately degraded picture. Instructors control the fog live, and every decision is captured with what was knowable at that moment, for a hindsight-safe AAR.**
 
-**Live demo:** _deployment pending — see [Deploy](#deploy)._ · **60-second demo:** open the app → _“See a finished demo exercise and its AAR”_.
+**Live:** https://vanguard-ops-0uex.onrender.com (Render free tier — first load after idle takes ~1 min) · **60-second demo:** open it → _“See a finished demo exercise and its AAR”_.
 
 > ⚠️ **Training simulation — synthetic data.** Every map, unit, callsign and event is fictional. No real unit designations, weapon or ballistic data, or electronic-attack technique data are used.
 
