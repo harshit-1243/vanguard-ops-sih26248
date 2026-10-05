@@ -1,0 +1,98 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    name: lint · typecheck · test · build · e2e
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: vanguard
+          POSTGRES_PASSWORD: vanguard
+          POSTGRES_DB: vanguard_test
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U vanguard" --health-interval 5s --health-timeout 3s --health-retries 20
+    env:
+      TEST_DATABASE_URL: postgresql://vanguard:vanguard@localhost:5432/vanguard_test
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9.15.9
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Apply migrations to the test database
+        run: pnpm --filter @vanguard/server exec prisma migrate deploy
+        env:
+          DATABASE_URL: ${{ env.TEST_DATABASE_URL }}
+      - run: pnpm lint
+      - run: pnpm typecheck
+      - name: Unit + integration tests (incl. Postgres store and ground-truth leak test)
+        run: pnpm test
+      - name: Sim coverage (≥ 90 % lines)
+        run: pnpm test:coverage
+      - run: pnpm build
+      - name: Install Playwright Chromium
+        run: pnpm exec playwright install --with-deps chromium
+      - name: E2E (DS + 3 trainees, multi-context) and accessibility
+        run: pnpm e2e
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: playwright-report
+          path: |
+            playwright-report
+            e2e/.artifacts
+          retention-days: 7
+
+  docker:
+    name: docker image + compose smoke
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build and start the full stack
+        run: docker compose up -d --build
+      - name: Wait for health
+        run: |
+          for i in $(seq 1 60); do
+            if curl -fsS http://localhost:8080/healthz; then echo; break; fi
+            sleep 2
+          done
+          curl -fsS http://localhost:8080/healthz | grep '"store":"postgres"'
+      - name: Smoke — SPA, scenarios, create, demo AAR + PDF
+        run: |
+          set -e
+          curl -fsS http://localhost:8080/ | grep -q '<div id="root">'
+          curl -fsS http://localhost:8080/api/scenarios | grep -q ridge-line
+          curl -fsS -X POST http://localhost:8080/api/sessions -H 'content-type: application/json' -d '{"scenarioId":"iron-bridge"}' | grep -q instructorToken
+          DEMO=$(curl -fsS -X POST http://localhost:8080/api/demo -H 'content-type: application/json' -d '{}')
+          CODE=$(echo "$DEMO" | sed -E 's/.*"code":"([A-Z0-9]+)".*/\1/')
+          TOKEN=$(echo "$DEMO" | sed -E 's/.*"instructorToken":"([^"]+)".*/\1/')
+          curl -fsS "http://localhost:8080/api/sessions/$CODE/aar?token=$TOKEN" | grep -q '"scenarioTitle":"Iron Bridge"'
+          curl -fsS -o aar.pdf "http://localhost:8080/api/sessions/$CODE/aar.pdf?token=$TOKEN"
+          head -c 5 aar.pdf | grep -q '%PDF-'
+      - name: Restart keeps data (event log in Postgres)
+        run: |
+          docker compose restart app
+          for i in $(seq 1 60); do curl -fsS http://localhost:8080/healthz && break; sleep 2; done
+          docker compose logs app | grep -q 'Seeded demo exercise'
+      - name: Logs on failure
+        if: failure()
+        run: docker compose logs
+      - run: docker compose down -v
+        if: always()
