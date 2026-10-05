@@ -22,9 +22,10 @@ services:
       - key: LOG_LEVEL
         value: info
       # Optional AI layer: set LLM_PROVIDER to groq | cerebras | xai | anthropic and add the matching key
-      # in the dashboard (Environment). With none, everything works on template text.
+      # in the dashboard (Environment). Unset/none = template text. sync:false so a Blueprint sync never
+      # overwrites the value chosen in the dashboard.
       - key: LLM_PROVIDER
-        value: none
+        sync: false
       - key: GROQ_API_KEY
         sync: false
       - key: CEREBRAS_API_KEY
